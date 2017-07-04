@@ -5,6 +5,14 @@
     "autoload": {
         "psr-0": {
             "oSoc\\smartflanders\\": "src/"
-        }
+        },
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "willdurand/negotiation": "^2.2",
+        "league/flysystem": "^1.0",
+        "peppeocchi/php-cron-scheduler": "^1.4",
+        "vlucas/phpdotenv": "^2.4",
+        "pietercolpaert/hardf": "^0.1.0"
     }
+
 }
