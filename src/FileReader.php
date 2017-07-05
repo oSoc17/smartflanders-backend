@@ -19,7 +19,7 @@ class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
 
         $server = $_ENV["BASE_URL"];
         $file_subject = $server . "?page=" . $filename;
-        $file_timestamp = strtotime(substr($filename, 0, $this->basename_length));
+        $file_timestamp = strtotime(substr($filename, 0));
         $prev = $this->get_prev_for_timestamp($file_timestamp);
         $next = $this->get_next_for_timestamp($file_timestamp);
         if ($prev) {

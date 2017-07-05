@@ -8,6 +8,7 @@ use pietercolpaert\hardf\TriGWriter;
 use \Dotenv;
 
 
+
 class FileSystemProcessor{
 
 
@@ -26,7 +27,7 @@ class FileSystemProcessor{
     {
         $this->$second_interval = $second_interval;
         date_default_timezone_set("Europe/Brussels");
-        $out_adapter = new Locale($out_dirname);
+        $out_adapter = new Local($out_dirname);
         $this->out_fs = new Filesystem($out_adapter);
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
@@ -36,7 +37,7 @@ class FileSystemProcessor{
         if(!$this->res_fs->has("static_data.tutrle")){
             $graph = GraphProcessor::get_static_data();
             $this->writer = new TriGWriter();
-            $this->writer->writeraddPrefixes($graph["prefixes"]);
+            $this->writer->addPrefixes($graph["prefixes"]);
             $this->writer->addTriples($graph["triples"]);
             $this->res_fs->write("static_data.turtle", $this->writer->end());
         }
@@ -138,7 +139,7 @@ class FileSystemProcessor{
         $timestamp = $this->round_timestamp($timestamp);
         $now = time();
         while($timestamp < $now) {
-            $timestamp += $this->minute_interval*60;
+            $timestamp += $this->second_interval*60;
             $filename = $this->get_filename_for_timestamp($timestamp);
             if ($this->out_fs->has($filename)) {
                 return $timestamp;
