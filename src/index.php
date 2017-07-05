@@ -2,11 +2,20 @@
 
 namespace oSoc\smartflanders;
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
+
 use \Dotenv;
+use Tracy\Debugger;
 
 
-// TODO publish static data with cache header on separate api point (no priority)
+//Tracy debugger
+Debugger::enable();
+
+// TODO parameters need to be passed, they are now hardcoded in THIS class only ....
+
+$out_dirname = __DIR__ . "/out";
+$res_dirname = __DIR__ . "/../../resources";
+$second_interval = 300;
 
 // If no preferred content type is specified, prefer turtle
 if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
@@ -15,7 +24,7 @@ if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
 
 $filename = null;
 
-$fs = new \otn\linkeddatex2\gather\ParkingHistoryFilesystem(__DIR__ . "/out", __DIR__ . "/../../resources");
+$fs = new FileSystemProcessor($out_dirname, $res_dirname ,$second_interval);
 
 if (!isset($_GET['page']) && !isset($_GET['time'])) {
     $filename = $fs->get_last_page();
@@ -28,7 +37,7 @@ if (!isset($_GET['page']) && !isset($_GET['time'])) {
     }
 } else if (isset($_GET['time'])) {
     // If timestamp is provided, find latest file before timestamp
-    $filename = $fs->get_closest_page_for_timestamp(strtotime($_GET['time']));
+    $filename = $fs->getClosestPage(strtotime($_GET['time']));
     if (!$filename) {
         http_response_code(404);
         die();
@@ -41,11 +50,14 @@ if (!isset($_GET['page'])) {
     header("Access-Control-Allow-Origin: *");
     header('Location: ' . $_ENV["BASE_URL"] . '?page=' . $filename);
 } else {
-    $graphs = $fs->get_graphs_from_file_with_links($filename);
+
+    // This is sloppy coding, casting would be better ....
+    $fileReader = new FileReader($out_dirname, $res_dirname ,$second_interval);
+    $graphs = $fileReader->get_graphs_from_file_with_links($filename);
     $historic = true;
     if ($filename === $fs->get_last_page()) {
         $historic = false;
     }
-    \otn\linkeddatex2\View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic);
+    View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic);
 }
 

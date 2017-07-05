@@ -8,7 +8,7 @@
 namespace oSoc\smartflanders;
 
 use pietercolpaert\hardf\TriGWriter;
-
+use Negotiation\Negotiator;
 Class View
 {
     /**
@@ -18,7 +18,7 @@ Class View
      */
     private static function headers($acceptHeader, $historic) {
         // Content negotiation using vendor/willdurand/negotiation
-        $negotiator = new \Negotiation\Negotiator();
+        $negotiator = new Negotiator();
         $priorities = array('text/turtle','application/rdf+xml');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
         $value = $mediaType->getValue();

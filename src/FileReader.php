@@ -73,7 +73,6 @@ class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
     private function get_static_data() {
         return $this->res_fs->read("static_data.turtle");
     }
-
 }
 
 

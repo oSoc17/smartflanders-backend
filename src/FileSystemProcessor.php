@@ -90,7 +90,7 @@ class FileSystemProcessor{
 
     // Get the last written page (closest to now)
     public function get_last_page() {
-        return $this->get_closest_page_for_timestamp(time());
+        return $this->getClosestPage(time());
     }
 
     // Write a measurement to a page
@@ -116,7 +116,7 @@ class FileSystemProcessor{
 
     // Get appropriate filename for given timestamp
     protected function get_filename_for_timestamp($timestamp) {
-        return substr(date('c', $this->round_timestamp($timestamp)), 0, $this->basename_length);
+        return substr(date('c', $this->round_timestamp($timestamp)), 0);
     }
 
     protected function get_prev_timestamp_for_timestamp($timestamp) {
@@ -124,7 +124,7 @@ class FileSystemProcessor{
         if ($oldest) {
             $timestamp = $this->round_timestamp($timestamp);
             while ($timestamp > $oldest) {
-                $timestamp -= $this->minute_interval*60;
+                $timestamp -= $this->second_interval*60;
                 $filename = $this->get_filename_for_timestamp($timestamp);
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
@@ -146,5 +146,11 @@ class FileSystemProcessor{
         }
         return false;
     }
+    public function has_file($filename) {
+        return $this->out_fs->has($filename);
+    }
+
+
+    // Returns fully dressed contents of file (with metadata, static data, etc)
 
 }
