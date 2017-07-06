@@ -13,7 +13,7 @@ class GraphProcessor
     public static function construct_graph()
     {
         $time = substr(date("c"), 0, 19);
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../../../");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../../C:/");
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;

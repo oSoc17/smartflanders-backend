@@ -1,16 +1,12 @@
 <?php
 
 namespace oSoc\smartflanders;
-
 require __DIR__ . '/../vendor/autoload.php';
-
-use \Dotenv;
+use Dotenv\Dotenv;
 use Tracy\Debugger;
-use oSoc\smartflanders\FileSystemProcessor;
-
-
 //Tracy debugger
 Debugger::enable();
+
 
 // TODO parameters need to be passed, they are now hardcoded in THIS class only ....
 
@@ -30,6 +26,7 @@ $fs = new FileSystemProcessor($out_dirname, $res_dirname ,$second_interval);
 if (!isset($_GET['page']) && !isset($_GET['time'])) {
     $filename = $fs->get_last_page();
 }
+
 else if (isset($_GET['page'])) {
     // If page name is provided, it must be exact
     $filename = $_GET['page'];
@@ -38,6 +35,7 @@ else if (isset($_GET['page'])) {
         die();
     }
 }
+
 else if (isset($_GET['time'])) {
     // If timestamp is provided, find latest file before timestamp
     $filename = $fs->getClosestPage(strtotime($_GET['time']));
@@ -48,12 +46,11 @@ else if (isset($_GET['time'])) {
 }
 
 if (!isset($_GET['page'])) {
-    $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
+    $dotenv = new Dotenv(__DIR__ . "/../../");
     $dotenv->load();
     header("Access-Control-Allow-Origin: *");
     header('Location: ' . $_ENV["BASE_URL"] . '?page=' . $filename);
 } else {
-
     // This is sloppy coding
     $fileReader = new FileReader($out_dirname, $res_dirname ,$second_interval);
     $graphs = $fileReader->get_graphs_from_file_with_links($filename);
@@ -63,4 +60,3 @@ if (!isset($_GET['page'])) {
     }
     View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic);
 }
-

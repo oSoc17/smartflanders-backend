@@ -1,15 +1,13 @@
 <?php
 
 namespace oSoc\smartflanders;
+
 use \League\Flysystem\Adapter\Local;
-use League\Flysystem\File;
 use \League\Flysystem\Filesystem;
 use pietercolpaert\hardf\TriGWriter;
 use \Dotenv;
 
-
-
-class FileSystemProcessor{
+Class FileSystemProcessor {
 
 
     protected $out_fs;
@@ -32,7 +30,7 @@ class FileSystemProcessor{
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
         //$this->basename_length = 19;
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../../Documents/");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "../htdocs/");
         $dotenv->load();
         if(!$this->res_fs->has("static_data.tutrle")){
             $graph = GraphProcessor::get_static_data();
