@@ -4,7 +4,7 @@ namespace oSoc\Smartflanders\Helpers;
 
 use \Dotenv;
 
-class GraphProcessor implements \IGraph
+class GraphProcessor implements IGraph
 {
     /**
      * @return array
