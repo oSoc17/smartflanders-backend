@@ -5,7 +5,10 @@
  * @author Pieter Colpaert <pieter.colpaert@ugent.be>
  */
 
-namespace oSoc\Smartflanders\Helpers;
+
+namespace oSoc\Smartflanders\GentParking;
+
+use oSoc\Smartflanders\Helpers;
 
 Class GhentToRDF
 {
@@ -30,13 +33,11 @@ Class GhentToRDF
         $res = $client->request('GET', self::$urls[1]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
 
-        //Process Parking Status messages (dynamic)
-        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication) {
-            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
-                $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
-                self::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
-            }
+        foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
+            $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
         }
+
         return $graph;
     }
 
@@ -56,7 +57,7 @@ Class GhentToRDF
 
         // Add the first triplet for each parking subject: its geodata node.
         foreach ($sameAs as $key => $val) {
-            self::addTriple($graph, $key, 'owl:sameAs', $val);
+            $graph = Helpers\TripleHelper::addTriple($graph, $key, 'owl:sameAs', $val);
         }
 
         $graph = self::preProcessing();
@@ -65,15 +66,28 @@ Class GhentToRDF
         $res = $client->request('GET', self::$urls[0]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
-        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication) {
-            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
-                $subject = (string)self::$parkingURIs[(string)$parking["id"]];
-                self::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
-                self::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking->parkingName->values[0]->value . '"');
-                self::addTriple($graph, $subject, 'dct:description', '"' . (string)$parking->parkingDescription->values[0]->value . '"');
-                self::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . (string)$parking->parkingNumberOfSpaces . '"');
-            }
+        foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
+            $subject = (string)self::$parkingURIs[(string)$parking["id"]];
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking->parkingName->values[0]->value . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'dct:description', '"' . (string)$parking->parkingDescription->values[0]->value . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . (string)$parking->parkingNumberOfSpaces . '"');
         }
+        // Add Dataset-specific metadata
+        $doc_triples = [
+            ['rdfs:label', '"Historic and real-time parking data in Ghent"'],
+            ['rdfs:comment', '"This document is a proof of concept mapping using Linked Datex2 by Pieter Colpaert"'],
+            ['foaf:homepage', 'https://github.com/smartflanders/ghent-datex2-to-linkeddata'],
+            ['cc:license', "https://data.stad.gent/algemene-licentie"]];
+        foreach ($doc_triples as $triple) {
+            array_push($graph["triples"], [
+                "graph" => "#Metadata",
+                "subject" => $_ENV["BASE_URL"],
+                "predicate" => $triple[0],
+                "object" => $triple[1]
+            ]);
+        }
+
         return $graph;
     }
 
@@ -101,20 +115,6 @@ Class GhentToRDF
         return $graph;
     }
 
-    /**
-     * @param $graph
-     * @param $subject
-     * @param $predicate
-     * @param $object
-     */
-    private static function addTriple(&$graph, $subject, $predicate, $object)
-    {
-        array_push($graph["triples"], [
-            'subject' => $subject,
-            'predicate' => $predicate,
-            'object' => $object
-        ]);
-    }
 
     /**
      * @return array

@@ -1,11 +1,12 @@
 <?php
 
-namespace oSoc\Smartflanders\Helpers;
+namespace oSoc\Smartflanders\GentParking;
+
 
 use \Dotenv;
+use \oSoc\Smartflanders\Helpers;
 
-class GraphProcessor implements IGraph
-
+class GraphProcessor implements Helpers\IGraph
 {
     /**
      * @return array
@@ -13,7 +14,7 @@ class GraphProcessor implements IGraph
     public static function constructGraph()
     {
         $time = substr(date("c"), 0, 19);
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../oSoc/");
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
@@ -50,21 +51,7 @@ class GraphProcessor implements IGraph
             "object" => "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime"
         ]);
 
-        // Add Dataset-specific metadata
-        $doc_triples = [
-            ['rdfs:label', '"Historic and real-time parking data in Ghent"'],
-            ['rdfs:comment', '"This document is a proof of concept mapping using Linked Datex2 by Pieter Colpaert"'],
-            ['foaf:homepage', 'https://github.com/smartflanders/ghent-datex2-to-linkeddata'],
-            ['cc:license', "https://data.stad.gent/algemene-licentie"]];
-        foreach ($doc_triples as $triple) {
-            //self::addTriple($result, $document, $triple[0], $triple[1]);
-            array_push($multigraph["triples"], [
-                "graph" => "#Metadata",
-                "subject" => $_ENV["BASE_URL"],
-                "predicate" => $triple[0],
-                "object" => $triple[1]
-            ]);
-        }
+
         return $multigraph;
     }
 

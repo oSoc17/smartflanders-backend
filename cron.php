@@ -3,7 +3,7 @@ require __DIR__ . '/vendor/autoload.php';
 /**
  * This script will be called periodically as a cron job.
  */
-use oSoc\Smartflanders\Helpers\GraphProcessor;
+use oSoc\Smartflanders\ParkoKortrijk;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 // Scheduler setup
@@ -26,6 +26,6 @@ if ($argc == 1) {
  */
 function acquire_data() {
     $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
-    $graph = GraphProcessor::construct_graph();
+    $graph = ParkoKortrijk\GraphProcessor::constructGraph();
     $fs->writeToFile(time(), $graph);
 }
