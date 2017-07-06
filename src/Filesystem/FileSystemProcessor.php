@@ -67,10 +67,10 @@ Class FileSystemProcessor {
 
     public function getClosestPage($timestamp) {
         $return_ts = $timestamp;
-        if (!$this->has_file($this->round_timestamp($timestamp))) {
+        if (!$this->hasFile($this->roundTimestamp($timestamp))) {
             // Exact file doesn't exist, get closest
-            $prev = $this->get_prev_timestamp_for_timestamp($timestamp);
-            $next = $this->get_next_timestamp_for_timestamp($timestamp);
+            $prev = $this->getPreviousTimestampFromTimestamp($timestamp);
+            $next = $this->getNextTimestampForTimestamp($timestamp);
             if ($prev && $next) {
                 // prev and next exist, get closest
                 $p_diff = $timestamp - $prev;
@@ -82,13 +82,13 @@ Class FileSystemProcessor {
             }
         }
         if ($return_ts) {
-            return $this->round_timestamp($return_ts);
+            return $this->roundTimestamp($return_ts);
         }
         return false;
     }
 
     // Get the last written page (closest to now)
-    public function get_last_page() {
+    public function getLastPage() {
         return $this->getClosestPage(time());
     }
 
@@ -98,7 +98,7 @@ Class FileSystemProcessor {
     // PRIVATE METHODS
 
     // Round a timestamp to its respective file timestamp
-    protected static function round_timestamp($timestamp) {
+    protected static function roundTimestamp($timestamp) {
         $minutes = date('i', $timestamp);
         $seconds = date('s', $timestamp);
         $timestamp -= ($minutes%5)*60 + $seconds;
@@ -106,20 +106,20 @@ Class FileSystemProcessor {
     }
 
     // Get the oldest timestamp for which a file exists
-    protected function get_oldest_timestamp() {
+    protected function getOldestTimestamp() {
         if ($this->res_fs->has("oldest_timestamp")) {
             return $this->res_fs->read("oldest_timestamp");
         }
         return false;
     }
 
-    protected function get_prev_timestamp_for_timestamp($timestamp) {
-        $oldest = $this->get_oldest_timestamp();
+    protected function getPreviousTimestampFromTimestamp($timestamp) {
+        $oldest = $this->getOldestTimestamp();
         if ($oldest) {
-            $timestamp = $this->round_timestamp($timestamp);
+            $timestamp = $this->roundTimestamp($timestamp);
             while ($timestamp > $oldest) {
                 $timestamp -= $this->second_interval;
-                $filename = $this->round_timestamp($timestamp);
+                $filename = $this->roundTimestamp($timestamp);
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
                 }
@@ -128,12 +128,12 @@ Class FileSystemProcessor {
         return false;
     }
 
-    protected function get_next_timestamp_for_timestamp($timestamp) {
-        $timestamp = $this->round_timestamp($timestamp);
+    protected function getNextTimestampForTimestamp($timestamp) {
+        $timestamp = $this->roundTimestamp($timestamp);
         $now = time();
         while($timestamp < $now) {
             $timestamp += $this->second_interval;
-            $filename = $this->round_timestamp($timestamp);
+            $filename = $this->roundTimestamp($timestamp);
             if ($this->out_fs->has($filename)) {
                 return $timestamp;
             }
@@ -141,7 +141,7 @@ Class FileSystemProcessor {
         return false;
     }
 
-    public function has_file($filename) {
+    public function hasFile($filename) {
         return $this->out_fs->has($filename);
     }
 }

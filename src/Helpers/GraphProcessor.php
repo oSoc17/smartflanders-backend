@@ -10,7 +10,7 @@ class GraphProcessor implements IGraph
     /**
      * @return array
      */
-    public static function construct_graph()
+    public static function constructGraph()
     {
         $time = substr(date("c"), 0, 19);
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
