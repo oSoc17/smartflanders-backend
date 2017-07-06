@@ -23,14 +23,15 @@ class ParkoToRDF {
         $client = new \GuzzleHttp\Client();
         $res = $client->request('GET', self::$url);
         $xmldoc = new \SimpleXMLElement($res->getBody());
-        echo $xmldoc;
+
         //Process Parking Status messages (dynamic)
-        foreach ($xmldoc->parkings as $parking) {
+        foreach ($xmldoc->parking as $parking) {
             //This is a stub
-            $subject = "http://open.data/stub/parko/parking/1" ;
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', (string)$parking->value);
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', $parking['vrij']);
+            //$subject = "http://open.data/stub/parko/parking/1" ;
+            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            //$graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+            //$graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces','"' . $parking['vrij'] . '"');
         }
         return $graph;
     }

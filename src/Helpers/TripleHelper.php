@@ -17,7 +17,7 @@ class TripleHelper
      * @param $object
      * @return mixed
      */
-    public static function addTriple(&$graph, $subject, $predicate, $object)
+    public static function addTriple($graph, $subject, $predicate, $object)
     {
         array_push($graph["triples"], [
             'subject' => $subject,

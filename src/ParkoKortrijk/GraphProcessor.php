@@ -35,7 +35,7 @@ class GraphProcessor implements Helpers\IGraph{
         }
 
         //Add data about the graph in default graph
-        array_push($multigraph["triples"], [
+        /*array_push($multigraph["triples"], [
             "graph" => "",
             "subject" => $graphname,
             "predicate" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
@@ -52,7 +52,7 @@ class GraphProcessor implements Helpers\IGraph{
             "subject" => $graphname,
             "predicate" => "http://www.w3.org/ns/prov#generatedAtTime",
             "object" => "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime"
-        ]);
+        ]);*/
         return $multigraph;
     }
 
