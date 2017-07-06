@@ -62,6 +62,6 @@ class GraphProcessor implements Helpers\IGraph{
      */
     public static function get_static_data()
     {
-        return GhentToRDF::getRemoteStaticContent();
+        return ParkoToRDF::getRemoteStaticContent();
     }
 }

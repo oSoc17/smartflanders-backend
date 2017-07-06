@@ -53,6 +53,14 @@ class ParkoToRDF {
     /**
      * @return array
      */
+    public static function getRemoteStaticContent() {
+        // TODO
+        return array();
+    }
+
+    /**
+     * @return array
+     */
     public static function getPrefixes()
     {
         return [

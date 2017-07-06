@@ -52,7 +52,7 @@ Class View
             array_push($graph, $quad);
         }
         Helpers\Metadata::addCountsToGraph($graph);
-        $writer->addPrefixes(Helpers\GhentToRDF::getPrefixes());
+        $writer->addPrefixes(ParkoKortrijk\ParkoToRDF::getPrefixes());
         $writer->addTriples($graph);
         echo $writer->end();
     }
