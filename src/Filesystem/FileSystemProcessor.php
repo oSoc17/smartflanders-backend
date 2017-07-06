@@ -22,13 +22,12 @@ Class FileSystemProcessor {
      */
     public function __construct($out_dirname, $res_dirname, $second_interval)
     {
-        $this->$second_interval = $second_interval;
+        $this->second_interval = $second_interval;
         date_default_timezone_set("Europe/Brussels");
         $out_adapter = new Local($out_dirname);
         $this->out_fs = new Filesystem($out_adapter);
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
-        //$this->basename_length = 19;
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         if(!$this->res_fs->has("static_data.turtle")){
@@ -66,7 +65,7 @@ Class FileSystemProcessor {
      */
     public function getClosestPage($timestamp) {
         $return_ts = $timestamp;
-        if (!$this->has_file($this->get_filename_for_timestamp($timestamp))) {
+        if (!$this->has_file($this->round_timestamp($timestamp))) {
             // Exact file doesn't exist, get closest
             $prev = $this->get_prev_timestamp_for_timestamp($timestamp);
             $next = $this->get_next_timestamp_for_timestamp($timestamp);
@@ -81,7 +80,7 @@ Class FileSystemProcessor {
             }
         }
         if ($return_ts) {
-            return $this->get_filename_for_timestamp($return_ts);
+            return $this->round_timestamp($return_ts);
         }
         return false;
     }
@@ -112,18 +111,13 @@ Class FileSystemProcessor {
         return false;
     }
 
-    // Get appropriate filename for given timestamp
-    protected function get_filename_for_timestamp($timestamp) {
-        return substr(date('c', $this->round_timestamp($timestamp)), 0);
-    }
-
     protected function get_prev_timestamp_for_timestamp($timestamp) {
         $oldest = $this->get_oldest_timestamp();
         if ($oldest) {
             $timestamp = $this->round_timestamp($timestamp);
             while ($timestamp > $oldest) {
-                $timestamp -= $this->second_interval*60;
-                $filename = $this->get_filename_for_timestamp($timestamp);
+                $timestamp -= $this->second_interval;
+                $filename = $this->round_timestamp($timestamp);
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
                 }
@@ -136,19 +130,16 @@ Class FileSystemProcessor {
         $timestamp = $this->round_timestamp($timestamp);
         $now = time();
         while($timestamp < $now) {
-            $timestamp += $this->second_interval*60;
-            $filename = $this->get_filename_for_timestamp($timestamp);
+            $timestamp += $this->second_interval;
+            $filename = $this->round_timestamp($timestamp);
             if ($this->out_fs->has($filename)) {
                 return $timestamp;
             }
         }
         return false;
     }
+
     public function has_file($filename) {
         return $this->out_fs->has($filename);
     }
-
-
-    // Returns fully dressed contents of file (with metadata, static data, etc)
-
 }

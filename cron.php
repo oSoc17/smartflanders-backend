@@ -4,7 +4,7 @@ require __DIR__ . '/vendor/autoload.php';
  * This script will be called periodically as a cron job.
  */
 use oSoc\Smartflanders\Helpers\GraphProcessor;
-use oSoc\Smartflanders\Filesystem\FileWriter;
+use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 // Scheduler setup
 // https://github.com/peppeocchi/php-cron-scheduler
@@ -25,7 +25,9 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $fs = new FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
+    /*$fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
     $graph = GraphProcessor::construct_graph();
-    $fs->write_measurement(time(), $graph);
+    $fs->write_measurement(time(), $graph);*/
+    $fileReader = new Filesystem\FileReader(__DIR__ . "/out", __DIR__ . "/resources", 300);
+    $graphs = $fileReader->get_graphs_from_file_with_links("1499334300");
 }
