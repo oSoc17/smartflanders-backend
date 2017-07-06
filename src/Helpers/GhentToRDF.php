@@ -5,7 +5,7 @@
  * @author Pieter Colpaert <pieter.colpaert@ugent.be>
  */
 
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders\Helpers;
 
 Class GhentToRDF
 {

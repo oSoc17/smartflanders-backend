@@ -1,5 +1,5 @@
 <?php
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders\Filesystem;
 
 use pietercolpaert\hardf\TriGParser;
 

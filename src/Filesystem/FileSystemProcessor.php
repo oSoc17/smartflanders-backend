@@ -1,15 +1,14 @@
 <?php
 
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders\Filesystem;
 
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
 use pietercolpaert\hardf\TriGWriter;
 use \Dotenv;
+use \oSoc\Smartflanders\Helpers;
 
 Class FileSystemProcessor {
-
-
     protected $out_fs;
     protected $res_fs;
     protected $second_interval;
@@ -30,10 +29,10 @@ Class FileSystemProcessor {
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
         //$this->basename_length = 19;
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "../htdocs/");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         if(!$this->res_fs->has("static_data.tutrle")){
-            $graph = GraphProcessor::get_static_data();
+            $graph = Helpers\GraphProcessor::get_static_data();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
             $this->writer->addTriples($graph["triples"]);

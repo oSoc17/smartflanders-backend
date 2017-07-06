@@ -4,7 +4,7 @@
  *
  * @author Pieter Colpaert <pieter.colpaert@ugent.be>
  */
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders\Helpers;
 use pietercolpaert\hardf\Util;
 use \Dotenv;
 Class Metadata

@@ -1,6 +1,6 @@
 <?php
 
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -12,8 +12,8 @@ Debugger::enable();
 
 // TODO parameters need to be passed, they are now hardcoded in THIS class only ....
 
-$out_dirname = __DIR__ . "/out";
-$res_dirname = __DIR__ . "/../../resources";
+$out_dirname = __DIR__ . "/../out";
+$res_dirname = __DIR__ . "/../resources";
 $second_interval = 300;
 
 // If no preferred content type is specified, prefer turtle
@@ -23,7 +23,7 @@ if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
 
 $filename = null;
 
-$fs = new FileSystemProcessor($out_dirname, $res_dirname ,$second_interval);
+$fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval);
 
 if (!isset($_GET['page']) && !isset($_GET['time'])) {
     $filename = $fs->get_last_page();

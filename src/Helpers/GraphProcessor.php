@@ -1,8 +1,7 @@
 <?php
 
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders\Helpers;
 
-use oSoc\smartflanders\GhentToRDF;
 use \Dotenv;
 
 class GraphProcessor
@@ -13,7 +12,7 @@ class GraphProcessor
     public static function construct_graph()
     {
         $time = substr(date("c"), 0, 19);
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../../C:/");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
