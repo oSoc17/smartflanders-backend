@@ -36,6 +36,5 @@ class FileWriter extends FileSystemProcessor {
         $trig_writer->addTriples($multigraph);
         $this->out_fs->put($filename, $trig_writer->end());
     }
-
 }
 

@@ -25,7 +25,7 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $fs = new FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
+    $fs = new FileWriter(__DIR__ . "\out", __DIR__ . "/resources", 300);
     $graph = GraphProcessor::construct_graph();
     $fs->write_measurement(time(), $graph);
 }
