@@ -15,11 +15,12 @@ class GraphProcessor implements Helpers\IGraph{
 
     public static function constructGraph()
     {
-        $time = substr(date("c"), 0, 19);
+        //$time = substr(date("c"), 0, 19);
+        $time = time();
        // $dotenv = new Dotenv(__DIR__ . "/../oSoc/");
       //  $dotenv->load();
        // $base_url = $_ENV["BASE_URL"] . "?time=";
-        $base_url = "http://193.190.76.149:81";
+        $base_url = "http://193.190.76.149:81/";
         $graphname = $base_url . $time;
 
         $graph = ParkoToRDF ::getRemoteDynamicContent();
