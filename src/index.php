@@ -25,13 +25,13 @@ $filename = null;
 $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval);
 
 if (!isset($_GET['page']) && !isset($_GET['time'])) {
-    $filename = $fs->get_last_page();
+    $filename = $fs->getLastPage();
 }
 
 else if (isset($_GET['page'])) {
     // If page name is provided, it must be exact
     $filename = $_GET['page'];
-    if (!$fs->has_file($filename)) {
+    if (!$fs->hasFile($filename)) {
         http_response_code(404);
         die();
     }
@@ -54,9 +54,9 @@ if (!isset($_GET['page'])) {
 } else {
     // This is sloppy coding
     $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval);
-    $graphs = $fileReader->get_graphs_from_file_with_links($filename);
+    $graphs = $fileReader->getGraphsFromFileIncludingLinks($filename);
     $historic = true;
-    if ($filename === $fs->get_last_page()) {
+    if ($filename === $fs->getLastPage()) {
         $historic = false;
     }
     View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic);

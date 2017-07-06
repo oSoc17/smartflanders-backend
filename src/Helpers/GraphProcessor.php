@@ -10,7 +10,7 @@ class GraphProcessor implements IGraph
     /**
      * @return array
      */
-    public static function construct_graph()
+    public static function constructGraph()
     {
         $time = substr(date("c"), 0, 19);
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
@@ -18,7 +18,7 @@ class GraphProcessor implements IGraph
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
 
-        $graph = GhentToRDF::get_remoteynamicContent();
+        $graph = GhentToRDF::getRemoteDynamicContent();
 
         $multigraph = [
             'prefixes' => $graph["prefixes"],

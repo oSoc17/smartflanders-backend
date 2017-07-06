@@ -13,8 +13,8 @@ class FileWriter extends FileSystemProcessor {
      * @param $graph
      * @Function: uses its parameters to
      */
-    public function write_measurement($timestamp, $graph) {
-        $rounded = $this->round_timestamp($timestamp);
+    public function writeToFile($timestamp, $graph) {
+        $rounded = $this->roundTimestamp($timestamp);
         // Save the oldest filename to resources to avoid linear searching in filenames
         if (!$this->res_fs->has("oldest_timestamp")) {
             $this->res_fs->write("oldest_timestamp", $rounded);

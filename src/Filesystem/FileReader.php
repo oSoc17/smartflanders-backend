@@ -6,12 +6,12 @@ use pietercolpaert\hardf\TriGParser;
 class FileReader extends FileSystemProcessor {
 
 
-    public function get_graphs_from_file_with_links($filename) {
-        $contents = $this->get_file_contents($filename);
+    public function getGraphsFromFileIncludingLinks($filename) {
+        $contents = $this->getFileContents($filename);
         $trig_parser = new TriGParser(["format" => "trig"]);
         $turtle_parser = new TriGParser(["format" => "turtle"]);
         $multigraph = $trig_parser->parse($contents);
-        $static_data = $turtle_parser->parse($this->get_static_data());
+        $static_data = $turtle_parser->parse($this->getStaticData());
         // Add static data in default graph
         foreach($static_data as $triple) {
             array_push($multigraph, $triple);
@@ -20,8 +20,8 @@ class FileReader extends FileSystemProcessor {
 
         $file_subject = $server . "?page=" . $filename;
         $file_timestamp = intval($filename);
-        $prev = $this->get_prev_for_timestamp($file_timestamp);
-        $next = $this->get_next_for_timestamp($file_timestamp);
+        $prev = $this->getPreviousFileFromTimestamp($file_timestamp);
+        $next = $this->getNextFileFromTimestamp($file_timestamp);
         if ($prev) {
             $triple = [
                 'subject' => $file_subject,
@@ -45,16 +45,16 @@ class FileReader extends FileSystemProcessor {
     }
 
     // Get the contents of a file
-    private function get_file_contents($filename) {
-        if ($this->has_file($filename)) {
+    private function getFileContents($filename) {
+        if ($this->hasFile($filename)) {
             return $this->out_fs->read($filename);
         }
         return false;
     }
 
     // Get next page for requested timestamp
-    private function get_next_for_timestamp($timestamp) {
-        $next_ts = $this->get_next_timestamp_for_timestamp($timestamp);
+    private function getNextFileFromTimestamp($timestamp) {
+        $next_ts = $this->getNextTimestampForTimestamp($timestamp);
         if ($next_ts) {
             return $next_ts;
         }
@@ -62,15 +62,15 @@ class FileReader extends FileSystemProcessor {
     }
 
     // Get previous page for requested timestamp (this is the previous page to page_for_timestamp)
-    private function get_prev_for_timestamp($timestamp) {
-        $prev_ts = $this->get_prev_timestamp_for_timestamp($timestamp);
+    private function getPreviousFileFromTimestamp($timestamp) {
+        $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
             return $prev_ts;
         }
         return false;
     }
 
-    private function get_static_data() {
+    private function getStaticData() {
         return $this->res_fs->read("static_data.turtle");
     }
 }

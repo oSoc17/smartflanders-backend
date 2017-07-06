@@ -27,5 +27,5 @@ if ($argc == 1) {
 function acquire_data() {
     $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
     $graph = GraphProcessor::construct_graph();
-    $fs->write_measurement(time(), $graph);
+    $fs->writeToFile(time(), $graph);
 }
