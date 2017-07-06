@@ -28,7 +28,7 @@ Class Metadata
      * @param $multigraph
      */
     public static function addCountsToGraph(&$multigraph) {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../xampp/");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"];
 
@@ -48,7 +48,7 @@ Class Metadata
      * @return array
      */
     public static function get() {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../xampp/");
+        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"];
         $result = array();

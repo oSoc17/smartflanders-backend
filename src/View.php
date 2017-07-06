@@ -5,7 +5,7 @@
  * @author Pieter Colpaert <pieter.colpaert@ugent.be>
  */
 
-namespace oSoc\smartflanders;
+namespace oSoc\Smartflanders;
 
 use pietercolpaert\hardf\TriGWriter;
 use Negotiation\Negotiator;
@@ -47,12 +47,12 @@ Class View
     public static function view($acceptHeader, $graph, $historic){
         $value = self::headers($acceptHeader, $historic);
         $writer = new TriGWriter(["format" => $value]);
-        $metadata = Metadata::get();
+        $metadata = Helpers\Metadata::get();
         foreach ($metadata as $quad) {
             array_push($graph, $quad);
         }
-        Metadata::addCountsToGraph($graph);
-        $writer->addPrefixes(GhentToRDF::getPrefixes());
+        Helpers\Metadata::addCountsToGraph($graph);
+        $writer->addPrefixes(Helpers\GhentToRDF::getPrefixes());
         $writer->addTriples($graph);
         echo $writer->end();
     }

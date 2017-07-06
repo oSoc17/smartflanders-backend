@@ -3,7 +3,7 @@ namespace oSoc\Smartflanders\Filesystem;
 
 use pietercolpaert\hardf\TriGParser;
 
-class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
+class FileReader extends FileSystemProcessor {
 
 
     public function get_graphs_from_file_with_links($filename) {
@@ -16,10 +16,10 @@ class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
         foreach($static_data as $triple) {
             array_push($multigraph, $triple);
         }
-
         $server = $_ENV["BASE_URL"];
+
         $file_subject = $server . "?page=" . $filename;
-        $file_timestamp = strtotime(substr($filename, 0));
+        $file_timestamp = intval($filename);
         $prev = $this->get_prev_for_timestamp($file_timestamp);
         $next = $this->get_next_for_timestamp($file_timestamp);
         if ($prev) {
@@ -56,7 +56,7 @@ class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
     private function get_next_for_timestamp($timestamp) {
         $next_ts = $this->get_next_timestamp_for_timestamp($timestamp);
         if ($next_ts) {
-            return $this->get_filename_for_timestamp($next_ts);
+            return $next_ts;
         }
         return false;
     }
@@ -65,7 +65,7 @@ class FileReader extends \oSoc\smartflanders\FileSystemProcessor {
     private function get_prev_for_timestamp($timestamp) {
         $prev_ts = $this->get_prev_timestamp_for_timestamp($timestamp);
         if ($prev_ts) {
-            return $this->get_filename_for_timestamp($prev_ts);
+            return $prev_ts;
         }
         return false;
     }

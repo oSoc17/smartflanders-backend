@@ -9,7 +9,6 @@ use Tracy\Debugger;
 //Tracy debugger
 Debugger::enable();
 
-
 // TODO parameters need to be passed, they are now hardcoded in THIS class only ....
 
 $out_dirname = __DIR__ . "/../out";
@@ -48,13 +47,13 @@ else if (isset($_GET['time'])) {
 }
 
 if (!isset($_GET['page'])) {
-    $dotenv = new Dotenv(__DIR__ . "/../../");
+    $dotenv = new Dotenv(__DIR__ . "/../");
     $dotenv->load();
     header("Access-Control-Allow-Origin: *");
     header('Location: ' . $_ENV["BASE_URL"] . '?page=' . $filename);
 } else {
     // This is sloppy coding
-    $fileReader = new FileReader($out_dirname, $res_dirname ,$second_interval);
+    $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval);
     $graphs = $fileReader->get_graphs_from_file_with_links($filename);
     $historic = true;
     if ($filename === $fs->get_last_page()) {

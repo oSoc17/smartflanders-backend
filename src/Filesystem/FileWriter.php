@@ -14,13 +14,13 @@ class FileWriter extends FileSystemProcessor {
      * @Function: uses its parameters to
      */
     public function write_measurement($timestamp, $graph) {
-        $rounded = $this-> round_timestamp($timestamp);
+        $rounded = $this->round_timestamp($timestamp);
         // Save the oldest filename to resources to avoid linear searching in filenames
         if (!$this->res_fs->has("oldest_timestamp")) {
             $this->res_fs->write("oldest_timestamp", $rounded);
         }
 
-        $filename = $this->get_filename_for_timestamp($timestamp);
+        $filename = $rounded;
 
         $multigraph = array();
 
