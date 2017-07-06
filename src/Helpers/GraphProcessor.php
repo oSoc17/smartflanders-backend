@@ -52,32 +52,6 @@ class GraphProcessor implements IGraph
         return $multigraph;
     }
 
-    /** Remove triples for which every given component has the given respective value
-     * eg:
-     * $components = ['resource', 'predicate'];
-     * $values = ['https://stad.gent/id/parking/P7', 'owl:sameAs']
-     * removes all triples of resource https://stad.gent/id/parking/P7 with predicate owl:sameAs
-     */
-    private static function remove_triples_with($graph, $components, $values)
-    {
-        $result = [
-            "prefixes" => $graph["prefixes"],
-            "triples" => []
-        ];
-        foreach ($graph["triples"] as $triple) {
-            $remove = true;
-            foreach ($components as $index => $component) {
-                if ($triple[$component] !== $values[$index]) {
-                    $remove = false;
-                }
-            }
-            if (!$remove) {
-                array_push($result["triples"], $triple);
-            }
-        }
-        return $result;
-    }
-
     /**
      * @return array
      */
