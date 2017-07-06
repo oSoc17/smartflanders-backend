@@ -25,9 +25,7 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    /*$fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
+    $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
     $graph = GraphProcessor::construct_graph();
-    $fs->write_measurement(time(), $graph);*/
-    $fileReader = new Filesystem\FileReader(__DIR__ . "/out", __DIR__ . "/resources", 300);
-    $graphs = $fileReader->get_graphs_from_file_with_links("1499334300");
+    $fs->write_measurement(time(), $graph);
 }
