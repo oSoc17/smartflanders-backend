@@ -12,25 +12,68 @@ Class GhentToRDF
     const STATIC = 0;
     const DYNAMIC = 1;
 
+    private static $parkingURIs;
+
     private static $urls = [
         self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
         self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus"
     ];
 
     /**
-     * @param $type
      * @return array
      */
-    public static function get($type){
+    public static function getRemoteDynamicContent(){
+        $graph = self::preProcessing();
+        // Send a GET request to the URL in the argument, expecting an XML file in return
+        $client = new \GuzzleHttp\Client();
+        $res = $client->request('GET', self::$urls[1]);
+        $xmldoc = new \SimpleXMLElement($res->getBody());
+
+        //Process Parking Status messages (dynamic)
+        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication) {
+            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
+                $subject = self::$parkingURIs[(string) $parkingStatus->parkingRecordReference["id"]];
+                self::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"'.(string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces.'"');
+                self::addTriple($graph, $subject, 'datex:parkingSiteStatus', '"'.(string)$parkingStatus->parkingSiteStatus.'"');
+                self::addTriple($graph, $subject, 'datex:parkingSiteOpeningStatus', '"'.(string)$parkingStatus->parkingSiteOpeningStatus.'"');
+            }
+        }
+        return $graph;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getRemoteStaticContent(){
+        $graph = self::preProcessing();
+        // Send a GET request to the URL in the argument, expecting an XML file in return
+        $client = new \GuzzleHttp\Client();
+        $res = $client->request('GET', self::$urls[0]);
+        $xmldoc = new \SimpleXMLElement($res->getBody());
+        //Process Parking data that does not change that often (Name, lat, long, etc. Static)
+        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication) {
+            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
+                $subject = (string)self::$parkingURIs[(string) $parking["id"]];
+                self::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+                self::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking->parkingName->values[0]->value . '"');
+                self::addTriple($graph, $subject, 'dct:description', '"' . (string)$parking->parkingDescription->values[0]->value . '"');
+                self::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . (string)$parking->parkingNumberOfSpaces . '"');
+            }
+        }
+        return $graph;
+    }
+
+    /**
+     * @return array
+     */
+    private static function preProcessing(){
         $graph = [
             'prefixes' => self::getPrefixes(),
             'triples' => []
         ];
-
-        $url = self::$urls[$type];
-
         // Map parking IDs to their URIs
-        $parkingURIs = [
+
+        self::$parkingURIs = [
             "1bcd7c6f-563b-4c07-803d-a2ad05014c9f" => "https://stad.gent/id/parking/P7",
             "a13c076c-4088-4623-bfcb-41ab45cb8f9f" => "https://stad.gent/id/parking/P10",
             "ac864c7c-5bf0-495a-a92f-2c3c4fcd834d" => "https://stad.gent/id/parking/P1",
@@ -52,32 +95,6 @@ Class GhentToRDF
         // Add the first triplet for each parking subject: its geodata node.
         foreach ($sameAs as $key => $val) {
             self::addTriple($graph, $key, 'owl:sameAs', $val);
-        }
-
-        // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new \GuzzleHttp\Client();
-        $res = $client->request('GET', $url);
-        $xmldoc = new \SimpleXMLElement($res->getBody());
-
-        //Process Parking Status messages (dynamic)
-        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication) {
-            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
-                $subject = $parkingURIs[(string) $parkingStatus->parkingRecordReference["id"]];
-                self::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"'.(string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces.'"');
-                self::addTriple($graph, $subject, 'datex:parkingSiteStatus', '"'.(string)$parkingStatus->parkingSiteStatus.'"');
-                self::addTriple($graph, $subject, 'datex:parkingSiteOpeningStatus', '"'.(string)$parkingStatus->parkingSiteOpeningStatus.'"');
-            }
-        }
-
-        //Process Parking data that does not change that often (Name, lat, long, etc. Static)
-        if ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication) {
-            foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
-                $subject = (string)$parkingURIs[(string) $parking["id"]];
-                self::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
-                self::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking->parkingName->values[0]->value . '"');
-                self::addTriple($graph, $subject, 'dct:description', '"' . (string)$parking->parkingDescription->values[0]->value . '"');
-                self::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . (string)$parking->parkingNumberOfSpaces . '"');
-            }
         }
         return $graph;
     }
