@@ -18,7 +18,7 @@ class GraphProcessor implements IGraph
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
 
-        $graph = GhentToRDF::getRemoteDynamicContent();
+        $graph = GhentToRDF::get_remoteynamicContent();
 
         $multigraph = [
             'prefixes' => $graph["prefixes"],
