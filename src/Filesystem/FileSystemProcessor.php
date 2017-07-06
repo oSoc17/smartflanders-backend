@@ -31,7 +31,7 @@ Class FileSystemProcessor {
         //$this->basename_length = 19;
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
-        if(!$this->res_fs->has("static_data.tutrle")){
+        if(!$this->res_fs->has("static_data.turtle")){
             $graph = Helpers\GraphProcessor::get_static_data();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
