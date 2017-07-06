@@ -22,7 +22,8 @@ Class GhentToRDF
     /**
      * @return array
      */
-    public static function getRemoteDynamicContent(){
+    public static function getRemoteDynamicContent()
+    {
         $graph = self::preProcessing();
         // Send a GET request to the URL in the argument, expecting an XML file in return
         $client = new \GuzzleHttp\Client();
@@ -32,10 +33,8 @@ Class GhentToRDF
         //Process Parking Status messages (dynamic)
         if ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication) {
             foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
-                $subject = self::$parkingURIs[(string) $parkingStatus->parkingRecordReference["id"]];
-                self::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"'.(string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces.'"');
-                self::addTriple($graph, $subject, 'datex:parkingSiteStatus', '"'.(string)$parkingStatus->parkingSiteStatus.'"');
-                self::addTriple($graph, $subject, 'datex:parkingSiteOpeningStatus', '"'.(string)$parkingStatus->parkingSiteOpeningStatus.'"');
+                $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
+                self::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
             }
         }
         return $graph;
@@ -44,7 +43,22 @@ Class GhentToRDF
     /**
      * @return array
      */
-    public static function getRemoteStaticContent(){
+    public static function getRemoteStaticContent()
+    {
+        $sameAs = [
+            "https://stad.gent/id/parking/P10" => "http://linkedgeodata.org/triplify/node204735155", #GSP
+            "https://stad.gent/id/parking/P7" => "http://linkedgeodata.org/triplify/node310469809", #SM
+            "https://stad.gent/id/parking/P1" => "http://linkedgeodata.org/triplify/node2547503851", #vrijdagmarkt
+            "https://stad.gent/id/parking/P4" => "http://linkedgeodata.org/triplify/node346358328", #savaanstraat
+            "https://stad.gent/id/parking/P8" => "http://linkedgeodata.org/triplify/node497394185", #Ramen
+            "https://stad.gent/id/parking/P2" => "http://linkedgeodata.org/triplify/node1310104245", #Reep
+        ];
+
+        // Add the first triplet for each parking subject: its geodata node.
+        foreach ($sameAs as $key => $val) {
+            self::addTriple($graph, $key, 'owl:sameAs', $val);
+        }
+
         $graph = self::preProcessing();
         // Send a GET request to the URL in the argument, expecting an XML file in return
         $client = new \GuzzleHttp\Client();
@@ -53,7 +67,7 @@ Class GhentToRDF
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         if ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication) {
             foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
-                $subject = (string)self::$parkingURIs[(string) $parking["id"]];
+                $subject = (string)self::$parkingURIs[(string)$parking["id"]];
                 self::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
                 self::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking->parkingName->values[0]->value . '"');
                 self::addTriple($graph, $subject, 'dct:description', '"' . (string)$parking->parkingDescription->values[0]->value . '"');
@@ -65,8 +79,10 @@ Class GhentToRDF
 
     /**
      * @return array
+     * Use this method to add content to both the dynamic and the static files
      */
-    private static function preProcessing(){
+    private static function preProcessing()
+    {
         $graph = [
             'prefixes' => self::getPrefixes(),
             'triples' => []
@@ -82,29 +98,17 @@ Class GhentToRDF
             "83f2b0c2-6e74-4700-a862-3bc9cd6a03f4" => "https://stad.gent/id/parking/P2"
         ];
 
-        // mapping to City of Ghent URIs to Linked Geo Data
-        $sameAs = [
-            "https://stad.gent/id/parking/P10" => "http://linkedgeodata.org/triplify/node204735155", #GSP
-            "https://stad.gent/id/parking/P7" => "http://linkedgeodata.org/triplify/node310469809", #SM
-            "https://stad.gent/id/parking/P1" => "http://linkedgeodata.org/triplify/node2547503851", #vrijdagmarkt
-            "https://stad.gent/id/parking/P4" =>"http://linkedgeodata.org/triplify/node346358328", #savaanstraat
-            "https://stad.gent/id/parking/P8" => "http://linkedgeodata.org/triplify/node497394185", #Ramen
-            "https://stad.gent/id/parking/P2" => "http://linkedgeodata.org/triplify/node1310104245", #Reep
-        ];
-
-        // Add the first triplet for each parking subject: its geodata node.
-        foreach ($sameAs as $key => $val) {
-            self::addTriple($graph, $key, 'owl:sameAs', $val);
-        }
         return $graph;
     }
+
     /**
      * @param $graph
      * @param $subject
      * @param $predicate
      * @param $object
      */
-    private static function addTriple(&$graph, $subject, $predicate, $object) {
+    private static function addTriple(&$graph, $subject, $predicate, $object)
+    {
         array_push($graph["triples"], [
             'subject' => $subject,
             'predicate' => $predicate,
@@ -115,7 +119,8 @@ Class GhentToRDF
     /**
      * @return array
      */
-    public static function getPrefixes() {
+    public static function getPrefixes()
+    {
         return [
             "datex" => "http://vocab.datex.org/terms#",
             "schema" => "http://schema.org/",

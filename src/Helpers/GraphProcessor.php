@@ -4,7 +4,7 @@ namespace oSoc\Smartflanders\Helpers;
 
 use \Dotenv;
 
-class GraphProcessor implements \IGraph
+class GraphProcessor
 {
     /**
      * @return array
@@ -17,16 +17,13 @@ class GraphProcessor implements \IGraph
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
 
-        $graph = GhentToRDF::get(GhentToRDF::DYNAMIC);
-
-        $graph = self::remove_triples_with($graph, ['predicate'], ['datex:parkingSiteStatus']);
-        $graph = self::remove_triples_with($graph, ['predicate'], ['datex:parkingSiteOpeningStatus']);
-        $graph = self::remove_triples_with($graph, ['predicate'], ['owl:sameAs']);
+        $graph = GhentToRDF::getRemoteDynamicContent();
 
         $multigraph = [
             'prefixes' => $graph["prefixes"],
             'triples' => []
         ];
+
         foreach ($graph["triples"] as $triple) {
             $triple['graph'] = $graphname;
             array_push($multigraph['triples'], $triple);
@@ -85,6 +82,6 @@ class GraphProcessor implements \IGraph
      */
     public static function get_static_data()
     {
-        return GhentToRDF::get(GhentToRDF::STATIC);
+        return GhentToRDF::getRemoteStaticContent();
     }
 }
