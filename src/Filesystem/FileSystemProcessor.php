@@ -52,6 +52,7 @@ Class FileSystemProcessor {
     /**
      * @param mixed $second_interval
      */
+
     public function setSecondInterval($second_interval)
     {
         $this->second_interval = $second_interval;
@@ -63,6 +64,7 @@ Class FileSystemProcessor {
      * This function receives a timestamp and look for the page where the data
      * for this timestamp can be found
      */
+
     public function getClosestPage($timestamp) {
         $return_ts = $timestamp;
         if (!$this->has_file($this->round_timestamp($timestamp))) {
