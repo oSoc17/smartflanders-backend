@@ -58,14 +58,7 @@ Class Metadata
         $mappingS = $base_url . "#mappingS";
         $mappingP = $base_url . "#mappingP";
         $mappingO = $base_url . "#mappingO";
-        $doc_triples = [
-            ['rdfs:label', '"Historic and real-time parking data in Ghent"'],
-            ['rdfs:comment', '"This document is a proof of concept mapping using Linked Datex2 by Pieter Colpaert"'],
-            ['foaf:homepage', 'https://github.com/smartflanders/ghent-datex2-to-linkeddata'],
-            ['cc:license', "https://data.stad.gent/algemene-licentie"]];
-        foreach ($doc_triples as $triple) {
-            self::addTriple($result, $document, $triple[0], $triple[1]);
-        }
+
         //This is a fake search sequence to trick the current version of the Linked Data Fragments client to work with this file
         self::addTriple($result, $dataset, "hydra:search", $search);
         self::addTriple($result, $mappingS, "hydra:variable", '"s"');
