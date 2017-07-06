@@ -17,6 +17,7 @@ class GraphProcessor
         $dotenv->load();
         $base_url = $_ENV["BASE_URL"] . "?time=";
         $graphname = $base_url . $time;
+
         $graph = GhentToRDF::get(GhentToRDF::DYNAMIC);
 
         $graph = self::remove_triples_with($graph, ['predicate'], ['datex:parkingSiteStatus']);

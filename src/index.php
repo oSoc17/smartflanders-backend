@@ -1,7 +1,9 @@
 <?php
 
 namespace oSoc\smartflanders;
+
 require __DIR__ . '/../vendor/autoload.php';
+
 use Dotenv\Dotenv;
 use Tracy\Debugger;
 //Tracy debugger

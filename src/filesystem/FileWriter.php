@@ -10,6 +10,11 @@ use pietercolpaert\hardf\TriGParser;
 
 class FileWriter extends FileSystemProcessor {
 
+    /**
+     * @param $timestamp
+     * @param $graph
+     * @Function: uses its parameters to
+     */
     public function write_measurement($timestamp, $graph) {
         $rounded = $this-> round_timestamp($timestamp);
         // Save the oldest filename to resources to avoid linear searching in filenames
@@ -20,6 +25,7 @@ class FileWriter extends FileSystemProcessor {
         $filename = $this->get_filename_for_timestamp($timestamp);
 
         $multigraph = array();
+
         if ($this->out_fs->has($filename)) {
             $trig_parser = new TriGParser(["format" => "trig"]);
             $multigraph = $trig_parser->parse($this->out_fs->read($filename));
@@ -33,11 +39,5 @@ class FileWriter extends FileSystemProcessor {
         $this->out_fs->put($filename, $trig_writer->end());
     }
 
-    /**
-     * Created by PhpStorm.
-     * User: Thibault
-     * Date: 04/07/2017
-     * Time: 14:34
-     */
 }
 

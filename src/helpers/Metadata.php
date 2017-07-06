@@ -9,6 +9,12 @@ use pietercolpaert\hardf\Util;
 use \Dotenv;
 Class Metadata
 {
+    /**
+     * @param $graph
+     * @param $subject
+     * @param $predicate
+     * @param $object
+     */
     private static function addTriple(&$graph, $subject, $predicate, $object) {
         array_push($graph, [
             'graph' => '#Metadata',
@@ -17,6 +23,10 @@ Class Metadata
             'object' => $object
         ]);
     }
+
+    /**
+     * @param $multigraph
+     */
     public static function addCountsToGraph(&$multigraph) {
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../xampp/");
         $dotenv->load();
@@ -33,6 +43,10 @@ Class Metadata
             'graph'=> "#Metadata"
         ]);
     }
+
+    /**
+     * @return array
+     */
     public static function get() {
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../xampp/");
         $dotenv->load();
@@ -65,7 +79,6 @@ Class Metadata
         self::addTriple($result, $search, "hydra:mapping", $mappingP);
         self::addTriple($result, $search, "hydra:mapping", $mappingO);
         //TODO: add triples about how to go to a specific page
-
         return $result;
     }
 }
