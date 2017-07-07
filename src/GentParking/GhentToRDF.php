@@ -8,29 +8,36 @@
 
 namespace oSoc\Smartflanders\GentParking;
 
+use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
+use Dotenv\Dotenv;
 
-Class GhentToRDF
+Class GhentToRDF implements Helpers\IGraphProcessor
 {
     const STATIC = 0;
     const DYNAMIC = 1;
-
-    private static $parkingURIs;
-
     private static $urls = [
         self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
         self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus"
     ];
 
+    private static $parkingURIs;
+    private static $sameAs;
+
     /**
      * @return array
      */
-    public static function getRemoteDynamicContent()
+    public function getDynamicGraph()
     {
+        $time = time();
+        $dotenv = new Dotenv(__DIR__ . "/../oSoc/");
+        $dotenv->load();
+        $graphname = $_ENV["BASE_URL"] . "?time=" . $time;
+
         $graph = self::preProcessing();
         // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new \GuzzleHttp\Client();
-        $res = $client->request('GET', self::$urls[1]);
+        $client = new Client();
+        $res = $client->request('GET', self::$urls[self::STATIC]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
 
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
@@ -38,33 +45,54 @@ Class GhentToRDF
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
         }
 
-        return $graph;
+        $multigraph = [
+            'prefixes' => $graph["prefixes"],
+            'triples' => []
+        ];
+
+        foreach ($graph["triples"] as $triple) {
+            $triple['graph'] = $graphname;
+            array_push($multigraph['triples'], $triple);
+        }
+
+        //Add data about the graph in default graph
+        /*array_push($multigraph["triples"], [
+            "graph" => "",
+            "subject" => $graphname,
+            "predicate" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "object" => "http://www.w3.org/ns/prov#Entity"
+        ]);
+        array_push($multigraph["triples"], [
+            "graph" => "",
+            "subject" => $graphname,
+            "predicate" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "object" => "http://www.w3.org/ns/prov#Bundle"
+        ]);
+        array_push($multigraph["triples"], [
+            "graph" => "",
+            "subject" => $graphname,
+            "predicate" => "http://www.w3.org/ns/prov#generatedAtTime",
+            "object" => "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime"
+        ]);*/
+
+        return $multigraph;
     }
 
     /**
      * @return array
      */
-    public static function getRemoteStaticContent()
+    public function getStaticGraph()
     {
         $graph = self::preProcessing();
-        $sameAs = [
-            "https://stad.gent/id/parking/P10" => "http://linkedgeodata.org/triplify/node204735155", #GSP
-            "https://stad.gent/id/parking/P7" => "http://linkedgeodata.org/triplify/node310469809", #SM
-            "https://stad.gent/id/parking/P1" => "http://linkedgeodata.org/triplify/node2547503851", #vrijdagmarkt
-            "https://stad.gent/id/parking/P4" => "http://linkedgeodata.org/triplify/node346358328", #savaanstraat
-            "https://stad.gent/id/parking/P8" => "http://linkedgeodata.org/triplify/node497394185", #Ramen
-            "https://stad.gent/id/parking/P2" => "http://linkedgeodata.org/triplify/node1310104245", #Reep
-        ];
 
         // Add the first triplet for each parking subject: its geodata node.
-        foreach ($sameAs as $key => $val) {
+        foreach (self::$sameAs as $key => $val) {
             $graph = Helpers\TripleHelper::addTriple($graph, $key, 'owl:sameAs', $val);
         }
 
-        $graph = self::preProcessing();
         // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new \GuzzleHttp\Client();
-        $res = $client->request('GET', self::$urls[0]);
+        $client = new Client();
+        $res = $client->request('GET', self::$urls[self::DYNAMIC]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
@@ -92,6 +120,11 @@ Class GhentToRDF
         return $graph;
     }
 
+    public function getName()
+    {
+        return "GhentParking";
+    }
+
     /**
      * @return array
      * Use this method to add content to both the dynamic and the static files
@@ -99,7 +132,7 @@ Class GhentToRDF
     private static function preProcessing()
     {
         $graph = [
-            'prefixes' => self::getPrefixes(),
+            'prefixes' => Helpers\TripleHelper::getPrefixes(),
             'triples' => []
         ];
         // Map parking IDs to their URIs
@@ -113,27 +146,15 @@ Class GhentToRDF
             "83f2b0c2-6e74-4700-a862-3bc9cd6a03f4" => "https://stad.gent/id/parking/P2"
         ];
 
-        return $graph;
-    }
-
-
-    /**
-     * @return array
-     */
-    public static function getPrefixes()
-    {
-        return [
-            "datex" => "http://vocab.datex.org/terms#",
-            "schema" => "http://schema.org/",
-            "dct" => "http://purl.org/dc/terms/",
-            "geo" => "http://www.w3.org/2003/01/geo/wgs84_pos#",
-            "owl" => "http://www.w3.org/2002/07/owl#",
-            "rdfs" => "http://www.w3.org/2000/01/rdf-schema#",
-            "hydra" => "http://www.w3.org/ns/hydra/core#",
-            "void" => "http://rdfs.org/ns/void#",
-            "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-            "foaf" => "http://xmlns.com/foaf/0.1/",
-            "cc" => "http://creativecommons.org/ns#"
+        self::$sameAs = [
+            "https://stad.gent/id/parking/P10" => "http://linkedgeodata.org/triplify/node204735155", #GSP
+            "https://stad.gent/id/parking/P7" => "http://linkedgeodata.org/triplify/node310469809", #SM
+            "https://stad.gent/id/parking/P1" => "http://linkedgeodata.org/triplify/node2547503851", #vrijdagmarkt
+            "https://stad.gent/id/parking/P4" => "http://linkedgeodata.org/triplify/node346358328", #savaanstraat
+            "https://stad.gent/id/parking/P8" => "http://linkedgeodata.org/triplify/node497394185", #Ramen
+            "https://stad.gent/id/parking/P2" => "http://linkedgeodata.org/triplify/node1310104245", #Reep
         ];
+
+        return $graph;
     }
 }

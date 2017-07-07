@@ -19,7 +19,10 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         $base_url = "http://193.190.76.149:81/";
         $graphname = $base_url . $time;
 
-        $graph = self::preProcessing();
+        $graph = [
+            'prefixes' => Helpers\TripleHelper::getPrefixes(),
+            'triples' => []
+        ];
 
         // Send a GET request to the URL in the argument, expecting an XML file in return
         $client = new Client();
@@ -78,19 +81,5 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     public function getName() {
         return "Parko";
-    }
-
-    /**
-     * @return array
-     * Use this method to add content to both the dynamic and the static files
-     */
-    private static function preProcessing()
-    {
-        $graph = [
-            'prefixes' => Helpers\TripleHelper::getPrefixes(),
-            'triples' => []
-        ];
-        // Map parking IDs to their URIs
-        return $graph;
     }
 }
