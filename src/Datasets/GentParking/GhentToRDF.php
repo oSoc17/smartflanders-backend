@@ -8,7 +8,6 @@
 
 namespace oSoc\Smartflanders\Datasets\GentParking;
 
-use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
 use Dotenv\Dotenv;
 
@@ -35,11 +34,8 @@ Class GhentToRDF implements Helpers\IGraphProcessor
         $graphname = $_ENV["BASE_URL"] . "?time=" . $time;
 
         $graph = self::preProcessing();
-        // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new Client();
-        $res = $client->request('GET', self::$urls[self::DYNAMIC]);
-        $xmldoc = new \SimpleXMLElement($res->getBody());
 
+        $xmldoc = Helpers\RequestHelper::getXML(self::$urls[self::DYNAMIC]);
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
             $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
@@ -72,10 +68,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             $graph = Helpers\TripleHelper::addTriple($graph, $key, 'owl:sameAs', $val);
         }
 
-        // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new Client();
-        $res = $client->request('GET', self::$urls[self::STATIC]);
-        $xmldoc = new \SimpleXMLElement($res->getBody());
+        $xmldoc = Helpers\RequestHelper::getXML(self::$urls[self::STATIC]);
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
             $subject = (string)self::$parkingURIs[(string)$parking["id"]];

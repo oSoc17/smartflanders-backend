@@ -2,9 +2,7 @@
 
 namespace oSoc\Smartflanders\Datasets\ParkoKortrijk;
 
-use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
-use Dotenv\Dotenv;
 
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
@@ -24,11 +22,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             'triples' => []
         ];
 
-        // Send a GET request to the URL in the argument, expecting an XML file in return
-        $client = new Client();
-        $res = $client->request('GET', self::$url);
-        $xmldoc = new \SimpleXMLElement($res->getBody());
-
+        $xmldoc = Helpers\RequestHelper::getXML(self::$url);
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
             //This is a stub
