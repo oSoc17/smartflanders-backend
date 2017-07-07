@@ -27,7 +27,7 @@ Class FileSystemProcessor {
     {
         $this->second_interval = $second_interval;
         date_default_timezone_set("Europe/Brussels");
-        $out_adapter = new Local($out_dirname);
+        $out_adapter = new Local($out_dirname . "/" . $graph_processor->getName());
         $this->out_fs = new Filesystem($out_adapter);
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);

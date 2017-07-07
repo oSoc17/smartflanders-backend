@@ -26,8 +26,12 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $graph_processor = new ParkoKortrijk\ParkoToRDF();
-    $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor);
-    $graph = $graph_processor->getDynamicGraph();
-    $fs->writeToFile(time(), $graph);
+    $graph_processor_kortrijk = new ParkoKortrijk\ParkoToRDF();
+    $graph_processor_ghent = new GentParking\GhentToRDF();
+    $fsk = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_kortrijk);
+    $fsg = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_ghent);
+    $graph_k = $graph_processor_kortrijk->getDynamicGraph();
+    $fsk->writeToFile(time(), $graph_k);
+    $graph_g = $graph_processor_ghent->getDynamicGraph();
+    $fsg->writeToFile(time(), $graph_g);
 }
