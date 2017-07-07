@@ -26,7 +26,7 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $graph_processor = new ParkoKortrijk\ParkoToRDF();
+    $graph_processor = new GentParking\GhentToRDF();
     $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor);
     $graph = $graph_processor->getDynamicGraph();
     $fs->writeToFile(time(), $graph);

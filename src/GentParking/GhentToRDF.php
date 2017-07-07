@@ -30,14 +30,14 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $dotenv = new Dotenv(__DIR__ . "/../oSoc/");
+        $dotenv = new Dotenv(__DIR__ . "/../../");
         $dotenv->load();
         $graphname = $_ENV["BASE_URL"] . "?time=" . $time;
 
         $graph = self::preProcessing();
         // Send a GET request to the URL in the argument, expecting an XML file in return
         $client = new Client();
-        $res = $client->request('GET', self::$urls[self::STATIC]);
+        $res = $client->request('GET', self::$urls[self::DYNAMIC]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
 
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
@@ -92,7 +92,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
 
         // Send a GET request to the URL in the argument, expecting an XML file in return
         $client = new Client();
-        $res = $client->request('GET', self::$urls[self::DYNAMIC]);
+        $res = $client->request('GET', self::$urls[self::STATIC]);
         $xmldoc = new \SimpleXMLElement($res->getBody());
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
