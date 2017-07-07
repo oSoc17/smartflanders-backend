@@ -13,14 +13,18 @@ Class FileSystemProcessor {
     protected $res_fs;
     protected $second_interval;
     protected $writer;
+    protected $graph_processor;
+    protected $static_data_filename;
 
     /**
      * @param mixed $out_dirname
-     * @param mixed @res_dirname
+     * @param $res_dirname
      * @param int $second_interval
      * FileSystem constructor.
+     * @param Helpers\IGraphProcessor $graph_processor
+     * @internal param $mixed @res_dirname
      */
-    public function __construct($out_dirname, $res_dirname, $second_interval)
+    public function __construct($out_dirname, $res_dirname, $second_interval, $graph_processor)
     {
         $this->second_interval = $second_interval;
         date_default_timezone_set("Europe/Brussels");
@@ -30,15 +34,16 @@ Class FileSystemProcessor {
         $this->res_fs = new Filesystem($res_adapter);
         $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
         $dotenv->load();
-        if(!$this->res_fs->has("static_data.turtle")){
-            $graph = Helpers\GraphProcessor::get_static_data();
+        $this->graph_processor = $graph_processor;
+        $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
+        if(!$this->res_fs->has($this->static_data_filename)){
+            $graph = $graph_processor->getStaticGraph();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
             $this->writer->addTriples($graph["triples"]);
-            $this->res_fs->write("static_data.turtle", $this->writer->end());
+            $this->res_fs->write($this->static_data_filename, $this->writer->end());
         }
     }
-
 
     /**
      * @return mixed

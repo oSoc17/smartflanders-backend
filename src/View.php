@@ -9,6 +9,8 @@ namespace oSoc\Smartflanders;
 
 use pietercolpaert\hardf\TriGWriter;
 use Negotiation\Negotiator;
+use oSoc\Smartflanders\Helpers;
+
 Class View
 {
     /**
@@ -52,7 +54,7 @@ Class View
             array_push($graph, $quad);
         }
         Helpers\Metadata::addCountsToGraph($graph);
-        $writer->addPrefixes(Helpers\GhentToRDF::getPrefixes());
+        $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
         $writer->addTriples($graph);
         echo $writer->end();
     }
