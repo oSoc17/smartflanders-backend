@@ -74,12 +74,3 @@ class FileReader extends FileSystemProcessor {
         return $this->res_fs->read("static_data.turtle");
     }
 }
-
-
-/**
- * Created by PhpStorm.
- * User: Thibault
- * Date: 04/07/2017
- * Time: 16:36
- */
-

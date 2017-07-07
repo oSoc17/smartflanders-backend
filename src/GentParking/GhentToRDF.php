@@ -46,6 +46,7 @@ Class GhentToRDF
      */
     public static function getRemoteStaticContent()
     {
+        $graph = self::preProcessing();
         $sameAs = [
             "https://stad.gent/id/parking/P10" => "http://linkedgeodata.org/triplify/node204735155", #GSP
             "https://stad.gent/id/parking/P7" => "http://linkedgeodata.org/triplify/node310469809", #SM
