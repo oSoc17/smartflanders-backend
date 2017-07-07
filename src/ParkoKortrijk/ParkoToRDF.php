@@ -49,25 +49,8 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             array_push($multigraph['triples'], $triple);
         }
 
-        //Add data about the graph in default graph
-        /*array_push($multigraph["triples"], [
-            "graph" => "",
-            "subject" => $graphname,
-            "predicate" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "object" => "http://www.w3.org/ns/prov#Entity"
-        ]);
-        array_push($multigraph["triples"], [
-            "graph" => "",
-            "subject" => $graphname,
-            "predicate" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-            "object" => "http://www.w3.org/ns/prov#Bundle"
-        ]);
-        array_push($multigraph["triples"], [
-            "graph" => "",
-            "subject" => $graphname,
-            "predicate" => "http://www.w3.org/ns/prov#generatedAtTime",
-            "object" => "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime"
-        ]);*/
+        Helpers\Metadata::addMeasurementMetadata($multigraph, $graphname, $time);
+
         return $multigraph;
     }
 
