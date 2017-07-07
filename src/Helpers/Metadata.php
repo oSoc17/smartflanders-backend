@@ -42,10 +42,8 @@ Class Metadata
     }
 
     public static function addMeasurementMetadata(&$multigraph, $graphname, $time) {
-        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
         $bundle = "http://www.w3.org/ns/prov#Bundle";
         $entity = "http://www.w3.org/ns/prov#Entity";
-        $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
         $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $bundle);
         $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $entity);
     }
