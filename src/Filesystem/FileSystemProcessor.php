@@ -5,7 +5,6 @@ namespace oSoc\Smartflanders\Filesystem;
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
 use pietercolpaert\hardf\TriGWriter;
-use \Dotenv;
 use \oSoc\Smartflanders\Helpers;
 
 Class FileSystemProcessor {
@@ -32,8 +31,6 @@ Class FileSystemProcessor {
         $this->out_fs = new Filesystem($out_adapter);
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
-        $dotenv->load();
         $this->graph_processor = $graph_processor;
         $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
         if(!$this->res_fs->has($this->static_data_filename)){
