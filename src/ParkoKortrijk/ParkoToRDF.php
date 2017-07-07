@@ -10,7 +10,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     private static $url = "http://193.190.76.149:81/ParkoParkings/counters.php";
 
-    public static function getDynamicGraph()
+    public function getDynamicGraph()
     {
         $time = time();
        // $dotenv = new Dotenv(__DIR__ . "/../oSoc/");
@@ -68,7 +68,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         return $multigraph;
     }
 
-    public static function getStaticGraph() {
+    public function getStaticGraph() {
         // TODO
         return array(
             "prefixes" => array(),
@@ -76,7 +76,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         );
     }
 
-    public static function getName() {
+    public function getName() {
         return "Parko";
     }
 
