@@ -22,11 +22,8 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         $xmldoc = Helpers\RequestHelper::getXML(self::$url);
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
-            //This is a stub
-            //$subject = "http://open.data/stub/parko/parking/1" ;
             $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
-            //$graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
-            //$graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
+
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces','"' . $parking['vrij'] . '"');
         }
 
@@ -46,11 +43,18 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     }
 
     public function getStaticGraph() {
-        // TODO
-        return array(
-            "prefixes" => array(),
-            "triples" => array()
-        );
+        $graph = [
+            'prefixes' => Helpers\TripleHelper::getPrefixes(),
+            'triples' => []
+        ];
+
+        $xmldoc = Helpers\RequestHelper::getXML(self::$url);
+        foreach ($xmldoc->parking as $parking) {
+            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
+        }
+        return $graph;
     }
 
     public function getName() {
