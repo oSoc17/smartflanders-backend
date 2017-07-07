@@ -3,7 +3,8 @@ require __DIR__ . '/vendor/autoload.php';
 /**
  * This script will be called periodically as a cron job.
  */
-use oSoc\Smartflanders\Helpers\GraphProcessor;
+use oSoc\Smartflanders\Datasets\ParkoKortrijk;
+use oSoc\Smartflanders\Datasets\GentParking;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 // Scheduler setup
@@ -25,7 +26,8 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300);
-    $graph = GraphProcessor::construct_graph();
+    $graph_processor = new GentParking\GhentToRDF();
+    $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor);
+    $graph = $graph_processor->getDynamicGraph();
     $fs->writeToFile(time(), $graph);
 }
