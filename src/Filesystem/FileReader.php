@@ -6,7 +6,7 @@ use pietercolpaert\hardf\TriGParser;
 class FileReader extends FileSystemProcessor {
 
 
-    public function getGraphsFromFileIncludingLinks($filename) {
+    public function getFullyDressedGraphsFromFile($filename) {
         $contents = $this->getFileContents($filename);
         $trig_parser = new TriGParser(["format" => "trig"]);
         $turtle_parser = new TriGParser(["format" => "turtle"]);
@@ -71,6 +71,6 @@ class FileReader extends FileSystemProcessor {
     }
 
     private function getStaticData() {
-        return $this->res_fs->read("static_data.turtle");
+        return $this->res_fs->read($this->static_data_filename);
     }
 }

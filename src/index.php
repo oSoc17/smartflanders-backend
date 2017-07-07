@@ -55,7 +55,7 @@ if (!isset($_GET['page'])) {
 } else {
     // This is sloppy coding
     $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval);
-    $graphs = $fileReader->getGraphsFromFileIncludingLinks($filename);
+    $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
     $historic = true;
     if ($filename === $fs->getLastPage()) {
         $historic = false;

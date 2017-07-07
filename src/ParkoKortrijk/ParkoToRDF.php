@@ -5,12 +5,6 @@ namespace oSoc\Smartflanders\ParkoKortrijk;
 use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
 use Dotenv\Dotenv;
-/**
- * Created by PhpStorm.
- * User: Thibault
- * Date: 06/07/2017
- * Time: 14:25
- */
 
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
@@ -76,7 +70,14 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     public static function getStaticGraph() {
         // TODO
-        return array();
+        return array(
+            "prefixes" => array(),
+            "triples" => array()
+        );
+    }
+
+    public static function getName() {
+        return "Parko";
     }
 
     /**
