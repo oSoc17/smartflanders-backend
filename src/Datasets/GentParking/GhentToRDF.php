@@ -6,7 +6,7 @@
  */
 
 
-namespace oSoc\Smartflanders\GentParking;
+namespace oSoc\Smartflanders\Datasets\GentParking;
 
 use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
@@ -30,7 +30,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $dotenv = new Dotenv(__DIR__ . "/../../");
+        $dotenv = new Dotenv(__DIR__ . "/../src/");
         $dotenv->load();
         $graphname = $_ENV["BASE_URL"] . "?time=" . $time;
 

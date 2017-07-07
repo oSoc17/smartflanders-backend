@@ -3,8 +3,8 @@ require __DIR__ . '/vendor/autoload.php';
 /**
  * This script will be called periodically as a cron job.
  */
-use oSoc\Smartflanders\ParkoKortrijk;
-use oSoc\Smartflanders\GentParking;
+use oSoc\Smartflanders\Datasets\ParkoKortrijk;
+use oSoc\Smartflanders\Datasets\GentParking;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 // Scheduler setup

@@ -1,6 +1,6 @@
 <?php
 
-namespace oSoc\Smartflanders\ParkoKortrijk;
+namespace oSoc\Smartflanders\Datasets\ParkoKortrijk;
 
 use GuzzleHttp\Client;
 use oSoc\Smartflanders\Helpers;
