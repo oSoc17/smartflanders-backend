@@ -91,12 +91,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             ['foaf:homepage', 'https://github.com/smartflanders/ghent-datex2-to-linkeddata'],
             ['cc:license', "https://data.stad.gent/algemene-licentie"]];
         foreach ($doc_triples as $triple) {
-            array_push($graph["triples"], [
-                "graph" => "#Metadata",
-                "subject" => $_ENV["BASE_URL"],
-                "predicate" => $triple[0],
-                "object" => $triple[1]
-            ]);
+            $graph = Helpers\TripleHelper::addQuad($graph, "#Metadata", $_ENV["BASE_URL"], $triple[0], $triple[1]);
         }
 
         return $graph;
