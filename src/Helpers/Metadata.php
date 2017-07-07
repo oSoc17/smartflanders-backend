@@ -6,7 +6,6 @@
  */
 namespace oSoc\Smartflanders\Helpers;
 use pietercolpaert\hardf\Util;
-use \Dotenv;
 
 Class Metadata
 {
@@ -28,10 +27,7 @@ Class Metadata
     /**
      * @param $multigraph
      */
-    public static function addCountsToGraph(&$multigraph) {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
-        $dotenv->load();
-        $base_url = $_ENV["BASE_URL"];
+    public static function addCountsToGraph(&$multigraph, $base_url) {
 
         $triples = 0;
         foreach ($multigraph as $quad) {
@@ -57,13 +53,9 @@ Class Metadata
     /**
      * @return array
      */
-    public static function get() {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . "/../../");
-        $dotenv->load();
-        $base_url = $_ENV["BASE_URL"];
+    public static function get($base_url) {
         $result = array();
         $dataset = $base_url . "#dataset";
-        $document = $base_url;
         $search = $base_url . "#search";
         $mappingS = $base_url . "#mappingS";
         $mappingP = $base_url . "#mappingP";
