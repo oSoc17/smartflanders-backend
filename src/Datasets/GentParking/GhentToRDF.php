@@ -29,7 +29,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $dotenv = new Dotenv(__DIR__ . "/../src/");
+        $dotenv = new Dotenv(__DIR__ . "/../../../");
         $dotenv->load();
         $graphname = $_ENV["BASE_URL"] . "?time=" . $time;
 
