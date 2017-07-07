@@ -46,14 +46,14 @@ Class View
      * @param $graph
      * @param $historic
      */
-    public static function view($acceptHeader, $graph, $historic){
+    public static function view($acceptHeader, $graph, $historic, $base_url){
         $value = self::headers($acceptHeader, $historic);
         $writer = new TriGWriter(["format" => $value]);
-        $metadata = Helpers\Metadata::get();
+        $metadata = Helpers\Metadata::get($base_url);
         foreach ($metadata as $quad) {
             array_push($graph, $quad);
         }
-        Helpers\Metadata::addCountsToGraph($graph);
+        Helpers\Metadata::addCountsToGraph($graph, $base_url);
         $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
         $writer->addTriples($graph);
         echo $writer->end();

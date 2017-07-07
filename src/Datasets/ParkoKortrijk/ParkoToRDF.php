@@ -7,15 +7,12 @@ use oSoc\Smartflanders\Helpers;
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
     private static $url = "http://193.190.76.149:81/ParkoParkings/counters.php";
+    const BASE_URL = "http://localhost:3000/";
 
     public function getDynamicGraph()
     {
         $time = time();
-       // $dotenv = new Dotenv(__DIR__ . "/../oSoc/");
-      //  $dotenv->load();
-       // $base_url = $_ENV["BASE_URL"] . "?time=";
-        $base_url = "http://193.190.76.149:81/";
-        $graphname = $base_url . $time;
+        $graphname = self::BASE_URL . $time;
 
         $graph = [
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
@@ -58,5 +55,10 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     public function getName() {
         return "Parko";
+    }
+
+    public function getBaseUrl()
+    {
+        return self::BASE_URL;
     }
 }

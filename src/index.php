@@ -4,7 +4,6 @@ namespace oSoc\Smartflanders;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Dotenv\Dotenv;
 use oSoc\Smartflanders\Datasets\ParkoKortrijk\ParkoToRDF;
 use Tracy\Debugger;
 
@@ -50,10 +49,8 @@ else if (isset($_GET['time'])) {
 }
 
 if (!isset($_GET['page'])) {
-    $dotenv = new Dotenv(__DIR__ . "/../");
-    $dotenv->load();
     header("Access-Control-Allow-Origin: *");
-    header('Location: ' . $_ENV["BASE_URL"] . '?page=' . $filename);
+    header('Location: ' . $graph_processor::BASE_URL . '?page=' . $filename);
 } else {
     // This is sloppy coding
     $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
@@ -62,5 +59,5 @@ if (!isset($_GET['page'])) {
     if ($filename === $fs->getLastPage()) {
         $historic = false;
     }
-    View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic);
+    View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor::BASE_URL);
 }
