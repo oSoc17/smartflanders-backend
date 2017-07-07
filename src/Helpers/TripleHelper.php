@@ -27,6 +27,16 @@ class TripleHelper
         return $graph;
     }
 
+    public static function addQuad($multigraph, $graph, $subject, $predicate, $object) {
+        array_push($multigraph["triples"], [
+            "graph" => $graph,
+            "subject" => $subject,
+            "predicate" => $predicate,
+            "object" => $object
+        ]);
+        return $multigraph;
+    }
+
     /**
      * @return array commonly used prefixes in turtle files
      */
