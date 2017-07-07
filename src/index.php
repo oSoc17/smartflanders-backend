@@ -5,7 +5,7 @@ namespace oSoc\Smartflanders;
 require __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
-use oSoc\Smartflanders\ParkoKortrijk\ParkoToRDF;
+use oSoc\Smartflanders\Datasets\ParkoKortrijk\ParkoToRDF;
 use Tracy\Debugger;
 
 //Tracy debugger
