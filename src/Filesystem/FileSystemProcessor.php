@@ -109,8 +109,9 @@ Class FileSystemProcessor {
 
     // Get the oldest timestamp for which a file exists
     protected function getOldestTimestamp() {
-        if ($this->res_fs->has("oldest_timestamp")) {
-            return $this->res_fs->read("oldest_timestamp");
+        $filename = $this->graph_processor->getName() . "_oldest_timestamp";
+        if ($this->res_fs->has($filename)) {
+            return $this->res_fs->read($filename);
         }
         return false;
     }
