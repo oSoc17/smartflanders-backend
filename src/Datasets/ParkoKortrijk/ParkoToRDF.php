@@ -63,6 +63,6 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     public function getBaseUrl()
     {
-        return self::BASE_URL;
+        return $this::BASE_URL;
     }
 }
