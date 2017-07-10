@@ -33,7 +33,7 @@ Class Metadata
         foreach ($multigraph as $quad) {
             $triples++;
         }
-        array_push($multigraph, [
+        array_push($multigraph["triples"], [
             'subject' => $base_url,
             'predicate' => 'void:triples',
             'object' => Util::createLiteral($triples + 1, 'http://www.w3.org/2001/XMLSchema#integer'),
@@ -41,13 +41,23 @@ Class Metadata
         ]);
     }
 
-    public static function addMeasurementMetadata(&$multigraph, $graphname, $time) {
-        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
-        $bundle = "http://www.w3.org/ns/prov#Bundle";
-        $entity = "http://www.w3.org/ns/prov#Entity";
-        $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
-        $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $bundle);
-        $multigraph = TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $entity);
+    public static function addMeasurementMetadata(&$multigraph) {
+        $measurements = array();
+        foreach($multigraph["triples"] as $quad) {
+            if ($quad["predicate"] === "http://www.w3.org/ns/prov#generatedAtTime") {
+                // Only measurement graphs have a "generatedAtTime" triple
+                if (!in_array($quad["subject"], $measurements)) {
+                    array_push($measurements, $quad["subject"]);
+                }
+            }
+        }
+        // measurements now contains all graph names for measurements
+        foreach($measurements as $measurement) {
+            $bundle = "http://www.w3.org/ns/prov#Bundle";
+            $entity = "http://www.w3.org/ns/prov#Entity";
+            $multigraph = TripleHelper::addTriple($multigraph, $measurement, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $bundle);
+            $multigraph = TripleHelper::addTriple($multigraph, $measurement, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", $entity);
+        }
     }
 
     /**
