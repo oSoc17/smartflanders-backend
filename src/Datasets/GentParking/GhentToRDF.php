@@ -50,7 +50,8 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             array_push($multigraph['triples'], $triple);
         }
 
-        Helpers\Metadata::addMeasurementMetadata($multigraph, $graphname, $time);
+        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
+        $multigraph = Helpers\TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
 
         return $multigraph;
     }
