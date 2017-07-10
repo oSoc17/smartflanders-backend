@@ -51,11 +51,12 @@ Class View
         $writer = new TriGWriter(["format" => $value]);
         $metadata = Helpers\Metadata::get($base_url);
         foreach ($metadata as $quad) {
-            array_push($graph, $quad);
+            array_push($graph["triples"], $quad);
         }
+        Helpers\Metadata::addMeasurementMetadata($graph);
         Helpers\Metadata::addCountsToGraph($graph, $base_url);
         $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
-        $writer->addTriples($graph);
+        $writer->addTriples($graph["triples"]);
         echo $writer->end();
     }
 }
