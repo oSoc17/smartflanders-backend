@@ -84,7 +84,7 @@ Class FileSystemProcessor {
             }
         }
         if ($return_ts) {
-            return $this->roundTimestamp($return_ts);
+            return (string)$this->roundTimestamp($return_ts);
         }
         return false;
     }
