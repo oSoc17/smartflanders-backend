@@ -20,7 +20,6 @@ Debugger::enable();
  * @param $graph_processor
  */
 function dataset($graph_processor) {
-    var_dump($_GET['page']);
     $out_dirname = __DIR__ . "/../out";
     $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
@@ -67,7 +66,7 @@ function dataset($graph_processor) {
         if ($filename === $fs->getLastPage()) {
             $historic = false;
         }
-        View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl());
+        View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl(), $graph_processor->getRealTimeMaxAge());
     }
 }
 

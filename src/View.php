@@ -18,19 +18,18 @@ Class View
      * @param $historic
      * @return mixed
      */
-    private static function headers($acceptHeader, $historic) {
+    private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
         $priorities = array('text/turtle','application/rdf+xml');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
         $value = $mediaType->getValue();
         header("Content-type: $value");
-
         //Max age is 1/2 minute for caches
         if ($historic) {
             header("Cache-Control: max-age=31536000");
         } else {
-            header("Cache-Control: max-age=30");
+            header("Cache-Control: max-age=" . $rt_max_age);
         }
 
         //Allow Cross Origin Resource Sharing
@@ -46,8 +45,8 @@ Class View
      * @param $graph
      * @param $historic
      */
-    public static function view($acceptHeader, $graph, $historic, $base_url){
-        $value = self::headers($acceptHeader, $historic);
+    public static function view($acceptHeader, $graph, $historic, $base_url, $rt_max_age){
+        $value = self::headers($acceptHeader, $historic, $rt_max_age);
         $writer = new TriGWriter(["format" => $value]);
         $metadata = Helpers\Metadata::get($base_url);
         foreach ($metadata as $quad) {

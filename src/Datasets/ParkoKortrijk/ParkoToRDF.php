@@ -66,4 +66,9 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     {
         return $this::BASE_URL;
     }
+
+    public function getRealTimeMaxAge()
+    {
+        return 30;
+    }
 }
