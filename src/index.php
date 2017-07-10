@@ -21,6 +21,7 @@ Debugger::enable();
  * @param $graph_processor
  */
 function dataset($graph_processor) {
+    echo "dataset";
     $out_dirname = __DIR__ . "/../out";
     $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
@@ -43,7 +44,7 @@ function dataset($graph_processor) {
         $filename = $_GET['page'];
         if (!$fs->hasFile($filename)) {
             http_response_code(404);
-            die();
+            die("Page not found");
         }
     }
 
@@ -52,7 +53,7 @@ function dataset($graph_processor) {
         $filename = $fs->getClosestPage(strtotime($_GET['time']));
         if (!$filename) {
             http_response_code(404);
-            die();
+            die("Time not found");
         }
     }
 
@@ -75,7 +76,7 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/dataset/(\w+)', function($dataset){
+$router->get('/dataset/(.*)', function($dataset){
     $nameToGP = [
         'Kortrijk' => new ParkoToRDF(),
         'Ghent' => new GhentToRDF(),
@@ -85,7 +86,7 @@ $router->get('/dataset/(\w+)', function($dataset){
         dataset($nameToGP[$dataset]);
     } else {
         http_response_code(404);
-        die();
+        die("Route not found");
     }
 });
 
