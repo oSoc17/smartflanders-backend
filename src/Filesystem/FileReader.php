@@ -9,13 +9,15 @@ class FileReader extends FileSystemProcessor {
     public function getFullyDressedGraphsFromFile($filename) {
         $contents = $this->getFileContents($filename);
         $trig_parser = new TriGParser(["format" => "trig"]);
-        $multigraph = $trig_parser->parse($contents);
         $static_data = $trig_parser->parse($this->getStaticData());
+        $multigraph = [
+            "triples" => $trig_parser->parse($contents)
+        ];
         // Add static data in default graph
         foreach($static_data as $triple) {
-            array_push($multigraph, $triple);
+            array_push($multigraph["triples"], $triple);
         }
-        $server = $_ENV["BASE_URL"];
+        $server = $this->graph_processor->getBaseUrl();
 
         $file_subject = $server . "?page=" . $filename;
         $file_timestamp = intval($filename);
@@ -28,7 +30,7 @@ class FileReader extends FileSystemProcessor {
                 'object' => $server . "?page=" . $prev,
                 'graph' => '#Metadata'
             ];
-            array_push($multigraph, $triple);
+            array_push($multigraph["triples"], $triple);
         }
         if ($next) {
             $triple = [
@@ -37,7 +39,7 @@ class FileReader extends FileSystemProcessor {
                 'object' => $server . "?page=" . $next,
                 'graph' => '#Metadata'
             ];
-            array_push($multigraph, $triple);
+            array_push($multigraph["triples"], $triple);
         }
 
         return $multigraph;
