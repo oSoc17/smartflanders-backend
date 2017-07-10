@@ -7,7 +7,7 @@ use oSoc\Smartflanders\Helpers;
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
     private static $url = "http://193.190.76.149:81/ParkoParkings/counters.php";
-    const BASE_URL = "http://localhost:3000/";
+    const BASE_URL = "http://localhost:3000/Kortrijk";
 
     public function getDynamicGraph()
     {

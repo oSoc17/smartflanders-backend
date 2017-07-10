@@ -15,7 +15,6 @@
         "vlucas/phpdotenv": "^2.4",
         "pietercolpaert/hardf": "^0.1.0",
         "tracy/tracy": "^2.4",
-        "symfony/finder": "^3.3",
-        "symfony/routing": "^3.3"
+        "bramus/router": "^1.1"
     }
 }

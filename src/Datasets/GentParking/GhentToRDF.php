@@ -18,7 +18,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
         self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
         self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
         // self::BASE => "https://linked.open.gent/parking/"
-        self::BASE => "http://localhost:3000/"
+        self::BASE => "http://localhost:3000/Ghent"
     ];
 
     private static $parkingURIs;
