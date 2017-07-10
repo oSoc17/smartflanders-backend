@@ -4,9 +4,7 @@ namespace oSoc\Smartflanders;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use oSoc\Smartflanders\Datasets\ParkoKortrijk\ParkoToRDF;
-use oSoc\Smartflanders\Datasets\GentParking\GhentToRDF;
-use oSoc\Smartflanders\Datasets\Ixor;
+use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use Tracy\Debugger;
 
@@ -78,9 +76,12 @@ $router = new Router\Router();
 
 $router->get('/dataset/(.*)', function($dataset){
     $nameToGP = [
-        'Kortrijk' => new ParkoToRDF(),
-        'Ghent' => new GhentToRDF(),
-        'Sint-Niklaas' => new Ixor\IxorSintNiklaas()
+        'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
+        'Ghent' => new Datasets\GentParking\GhentToRDF(),
+        'IxorSint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
+        'IxorGhent' => new Datasets\Ixor\IxorGent(),
+        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
+        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
     ];
     if ($nameToGP[$dataset] !== null) {
         dataset($nameToGP[$dataset]);
@@ -94,7 +95,10 @@ $router->get('/entry/', function() {
     $nameToGP = [
         'Kortrijk' => new ParkoToRDF(),
         'Ghent' => new GhentToRDF(),
-        'Sint-Niklaas' => new Ixor\IxorSintNiklaas()
+        'IxorSint-Niklaas' => new Ixor\IxorSintNiklaas(),
+        'IxorGhent' => new Datasets\Ixor\IxorGent(),
+        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
+        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
     ];
     $result = array();
     foreach ($nameToGP as $name => $proc) {

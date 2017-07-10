@@ -3,9 +3,7 @@ require __DIR__ . '/vendor/autoload.php';
 /**
  * This script will be called periodically as a cron job.
  */
-use oSoc\Smartflanders\Datasets\ParkoKortrijk;
-use oSoc\Smartflanders\Datasets\GentParking;
-use oSoc\Smartflanders\Datasets\Ixor;
+use oSoc\Smartflanders\Datasets;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 use oSoc\Smartflanders\View;
@@ -28,17 +26,17 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $graph_processor_kortrijk = new ParkoKortrijk\ParkoToRDF();
-    $graph_processor_ghent = new GentParking\GhentToRDF();
-    $graph_processor_stniklaas = new Ixor\IxorSintNiklaas();
-    $fsk = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_kortrijk);
-    $fsg = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_ghent);
-    $fsstn = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_stniklaas);
-
-    $graph_k = $graph_processor_kortrijk->getDynamicGraph();
-    $fsk->writeToFile(time(), $graph_k);
-    $graph_g = $graph_processor_ghent->getDynamicGraph();
-    $fsg->writeToFile(time(), $graph_g);
-    $graph_stn = $graph_processor_stniklaas->getDynamicGraph();
-    $fsstn->writeToFile(time(), $graph_stn);
+    $processors = [
+        new Datasets\ParkoKortrijk\ParkoToRDF(),
+        new Datasets\GentParking\GhentToRDF(),
+        new Datasets\Ixor\IxorMechelen(),
+        new Datasets\Ixor\IxorGent(),
+        new Datasets\Ixor\IxorLeuven(),
+        new Datasets\Ixor\IxorSintNiklaas()
+    ];
+    foreach ($processors as $processor) {
+        $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $processor);
+        $graph = $processor->getDynamicGraph();
+        $fs->writeToFile(time(), $graph);
+    }
 }
