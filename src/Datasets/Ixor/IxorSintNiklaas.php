@@ -49,7 +49,7 @@ class IxorSintNiklaas implements Helpers\IGraphProcessor
 
     public function getName()
     {
-        return "SintNiklaas";
+        return "Sint-Niklaas";
     }
 
     public function getBaseUrl()
