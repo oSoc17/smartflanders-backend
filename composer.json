@@ -14,6 +14,7 @@
         "peppeocchi/php-cron-scheduler": "^1.4",
         "vlucas/phpdotenv": "^2.4",
         "pietercolpaert/hardf": "^0.1.0",
-        "tracy/tracy": "^2.4"
+        "tracy/tracy": "^2.4",
+        "bramus/router": "^1.1"
     }
 }
