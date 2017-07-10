@@ -6,6 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use oSoc\Smartflanders\Datasets\ParkoKortrijk\ParkoToRDF;
 use oSoc\Smartflanders\Datasets\GentParking\GhentToRDF;
+use oSoc\Smartflanders\Datasets\Ixor;
 use Bramus\Router;
 use Tracy\Debugger;
 
@@ -77,7 +78,8 @@ $router = new Router\Router();
 $router->get('/dataset/(\w+)', function($dataset){
     $nameToGP = [
         'Kortrijk' => new ParkoToRDF(),
-        'Ghent' => new GhentToRDF()
+        'Ghent' => new GhentToRDF(),
+        'Sint-Niklaas' => new Ixor\IxorSintNiklaas()
     ];
     if ($nameToGP[$dataset] !== null) {
         dataset($nameToGP[$dataset]);
@@ -90,7 +92,8 @@ $router->get('/dataset/(\w+)', function($dataset){
 $router->get('/entry/', function() {
     $nameToGP = [
         'Kortrijk' => new ParkoToRDF(),
-        'Ghent' => new GhentToRDF()
+        'Ghent' => new GhentToRDF(),
+        'Sint-Niklaas' => new Ixor\IxorSintNiklaas()
     ];
     $result = array();
     foreach ($nameToGP as $name => $proc) {
