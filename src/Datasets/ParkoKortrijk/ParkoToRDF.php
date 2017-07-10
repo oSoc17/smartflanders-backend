@@ -12,7 +12,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = self::BASE_URL . $time;
+        $graphname = self::BASE_URL . "?time=" . $time;
 
         $graph = [
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
@@ -23,10 +23,10 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
             $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
-
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces','"' . $parking['vrij'] . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces','"' . $parking['vrij'] . '"');
         }
 
+        // TODO Do we need $multigraph?
         $multigraph = [
             'prefixes' => $graph["prefixes"],
             'triples' => []
