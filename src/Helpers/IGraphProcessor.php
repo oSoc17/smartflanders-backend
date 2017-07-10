@@ -7,4 +7,5 @@ Interface IGraphProcessor {
     public function getStaticGraph();
     public function getName();
     public function getBaseUrl();
+    public function getRealTimeMaxAge();
 }

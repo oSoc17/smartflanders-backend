@@ -100,6 +100,11 @@ Class GhentToRDF implements Helpers\IGraphProcessor
         return self::URLS[self::BASE];
     }
 
+    public function getRealTimeMaxAge()
+    {
+        return 30;
+    }
+
     /**
      * @return array
      * Use this method to add content to both the dynamic and the static files
