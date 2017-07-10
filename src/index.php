@@ -80,14 +80,12 @@ $router->get('/(\w+)', function($dataset){
         'Kortrijk' => new ParkoToRDF(),
         'Ghent' => new GhentToRDF()
     ];
-    dataset($nameToGP[$dataset]);
-    /*if (in_array($dataset, $nameToGP)) {
+    if ($nameToGP[$dataset] !== null) {
+        dataset($nameToGP[$dataset]);
     } else {
-        echo $dataset . "\n";
-        var_dump($nameToGP);
         http_response_code(404);
         die();
-    }*/
+    }
 });
 
 $router->run();
