@@ -9,11 +9,10 @@ class FileReader extends FileSystemProcessor {
     public function getFullyDressedGraphsFromFile($filename) {
         $contents = $this->getFileContents($filename);
         $trig_parser = new TriGParser(["format" => "trig"]);
-        $turtle_parser = new TriGParser(["format" => "turtle"]);
+        $static_data = $trig_parser->parse($this->getStaticData());
         $multigraph = [
             "triples" => $trig_parser->parse($contents)
         ];
-        $static_data = $turtle_parser->parse($this->getStaticData());
         // Add static data in default graph
         foreach($static_data as $triple) {
             array_push($multigraph["triples"], $triple);
