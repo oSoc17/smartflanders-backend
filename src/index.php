@@ -75,7 +75,7 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/(\w+)', function($dataset){
+$router->get('/dataset/(\w+)', function($dataset){
     $nameToGP = [
         'Kortrijk' => new ParkoToRDF(),
         'Ghent' => new GhentToRDF()
@@ -86,6 +86,18 @@ $router->get('/(\w+)', function($dataset){
         http_response_code(404);
         die();
     }
+});
+
+$router->get('/entry/', function() {
+    $nameToGP = [
+        'Kortrijk' => new ParkoToRDF(),
+        'Ghent' => new GhentToRDF()
+    ];
+    $result = array();
+    foreach ($nameToGP as $name => $proc) {
+        array_push($result, $proc->getBaseUrl());
+    }
+    echo json_encode($result);
 });
 
 $router->run();
