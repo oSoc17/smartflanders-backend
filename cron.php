@@ -7,6 +7,7 @@ use oSoc\Smartflanders\Datasets\ParkoKortrijk;
 use oSoc\Smartflanders\Datasets\GentParking;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
+use oSoc\Smartflanders\View;
 // Scheduler setup
 // https://github.com/peppeocchi/php-cron-scheduler
 // If this script is called with argument "debug", it will simply acquire and write data once
