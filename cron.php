@@ -5,6 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
  */
 use oSoc\Smartflanders\Datasets\ParkoKortrijk;
 use oSoc\Smartflanders\Datasets\GentParking;
+use oSoc\Smartflanders\Datasets\Ixor;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
 use oSoc\Smartflanders\View;
@@ -29,10 +30,15 @@ if ($argc == 1) {
 function acquire_data() {
     $graph_processor_kortrijk = new ParkoKortrijk\ParkoToRDF();
     $graph_processor_ghent = new GentParking\GhentToRDF();
+    $graph_processor_stniklaas = new Ixor\IxorSintNiklaas();
     $fsk = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_kortrijk);
     $fsg = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_ghent);
+    $fsstn = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $graph_processor_stniklaas);
+
     $graph_k = $graph_processor_kortrijk->getDynamicGraph();
     $fsk->writeToFile(time(), $graph_k);
     $graph_g = $graph_processor_ghent->getDynamicGraph();
     $fsg->writeToFile(time(), $graph_g);
+    $graph_stn = $graph_processor_stniklaas->getDynamicGraph();
+    $fsstn->writeToFile(time(), $graph_stn);
 }

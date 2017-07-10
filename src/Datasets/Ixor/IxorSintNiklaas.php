@@ -7,6 +7,9 @@ class IxorSintNiklaas implements Helpers\IGraphProcessor
 {
     private $url = "https://smartflanders.ixortalk.com/api/v1.2/parkings/Sint-Niklaas";
     private $base_url = "http://localhost:3000/dataset/Sint-Niklaas";
+    private $authHeader = ['auth' =>
+        ['smartflanders', 'ySbwmmALC2z4cirWsEs8']
+    ];
 
     public function getDynamicGraph()
     {
@@ -17,14 +20,15 @@ class IxorSintNiklaas implements Helpers\IGraphProcessor
             'triples' => []
         ];
 
-        $authHeader = ['auth' =>
-            ['smartflanders', 'ySbwmmALC2z4cirWsEs8']
-        ];
-        $data = Helpers\RequestHelper::getJSON($this->url, $authHeader);
+        $data = Helpers\RequestHelper::getJSON($this->url, $this->authHeader);
         foreach($data->parkings as $parking) {
             $subject = "http://open.data/stub/ixorstniklaas/" . str_replace(' ', '-', $parking->name);
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $parking->availableCapacity . '"');
+            $graph = Helpers\TripleHelper::addQuad($graph, $graphname, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $parking->availableCapacity . '"');
         }
+
+        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
+        $graph = Helpers\TripleHelper::addTriple($graph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
+
         return $graph;
     }
 
@@ -34,7 +38,7 @@ class IxorSintNiklaas implements Helpers\IGraphProcessor
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
             'triples' => []
         ];
-        $data = Helpers\RequestHelper::getJSON($this->url, $authHeader);
+        $data = Helpers\RequestHelper::getJSON($this->url, $this->authHeader);
         foreach($data->parkings as $parking) {
             $subject = "http://open.data/stub/ixorstniklaas/" . str_replace(' ', '-', $parking->name);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $parking->totalCapacity . '"');
