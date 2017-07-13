@@ -6,8 +6,10 @@ class IxorSintNiklaas extends IxorToRDF
 {
     public function __construct()
     {
-        $fetch = "https://smartflanders.ixortalk.com/api/v1.2/parkings/Sint-Niklaas/";
-        $publish = "http://localhost:3000/parking/Sint-Niklaas/";
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $fetch = $_ENV["IXOR_SINT-NIKLAAS_PUBLISH"];
+        $publish = $_ENV["IXOR_SINT-NIKLAAS_FETCH"];
         parent::__construct($fetch, $publish);
     }
 

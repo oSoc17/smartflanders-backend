@@ -6,8 +6,10 @@ class IxorLeuven extends IxorToRDF
 {
     public function __construct()
     {
-        $fetch = "https://smartflanders.ixortalk.com/api/v1.2/parkings/Leuven/";
-        $publish = "http://localhost:3000/dataset/IxorLeuven/";
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $fetch = $_ENV["IXOR_LEUVEN_PUBLISH"];
+        $publish = $_ENV["IXOR_LEUVEN_FETCH"];
         parent::__construct($fetch, $publish);
     }
 
