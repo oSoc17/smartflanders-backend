@@ -14,15 +14,21 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     const STATIC = 0;
     const DYNAMIC = 1;
     const BASE = 2;
-    const URLS = [
-        self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
-        self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
-        // self::BASE => "https://linked.open.gent/parking/"
-        self::BASE => "http://localhost:3000/dataset/Ghent"
-    ];
+    private $urls;
 
     private static $parkingURIs;
     private static $sameAs;
+
+    public function __construct()
+    {
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $this->urls = [
+            self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
+            self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
+            self::BASE => $_ENV['GHENT_PUBLISH']
+        ];
+    }
 
     /**
      * @return array
@@ -30,11 +36,11 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = self::URLS[self::BASE] . "?time=" . $time;
+        $graphname = $this->urls[self::BASE] . "?time=" . $time;
 
         $graph = self::preProcessing();
 
-        $xmldoc = Helpers\RequestHelper::getXML(self::URLS[self::DYNAMIC]);
+        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::DYNAMIC]);
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
             $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
@@ -68,7 +74,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             $graph = Helpers\TripleHelper::addTriple($graph, $key, 'owl:sameAs', $val);
         }
 
-        $xmldoc = Helpers\RequestHelper::getXML(self::URLS[self::STATIC]);
+        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::STATIC]);
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
             $subject = (string)self::$parkingURIs[(string)$parking["id"]];
@@ -84,7 +90,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             ['foaf:homepage', 'https://github.com/smartflanders/ghent-datex2-to-linkeddata'],
             ['cc:license', "https://data.stad.gent/algemene-licentie"]];
         foreach ($doc_triples as $triple) {
-            $graph = Helpers\TripleHelper::addQuad($graph, "#Metadata", self::URLS[self::BASE], $triple[0], $triple[1]);
+            $graph = Helpers\TripleHelper::addQuad($graph, "#Metadata", $this->urls[self::BASE], $triple[0], $triple[1]);
         }
 
         return $graph;
@@ -97,7 +103,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
 
     public function getBaseUrl()
     {
-        return self::URLS[self::BASE];
+        return $this->urls[self::BASE];
     }
 
     public function getRealTimeMaxAge()
