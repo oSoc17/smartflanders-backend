@@ -19,7 +19,6 @@ Debugger::enable();
  * @param $graph_processor
  */
 function dataset($graph_processor) {
-    echo "dataset";
     $out_dirname = __DIR__ . "/../out";
     $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
@@ -74,14 +73,13 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/dataset/(.*)', function($dataset){
+$router->get('/parking/(.*)', function($dataset){
     $nameToGP = [
         'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
         'Ghent' => new Datasets\GentParking\GhentToRDF(),
-        'IxorSint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
-        'IxorGhent' => new Datasets\Ixor\IxorGent(),
-        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
-        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
+        'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
+        'Leuven' => new Datasets\Ixor\IxorLeuven(),
+        'Mechelen' => new Datasets\Ixor\IxorMechelen()
     ];
     if ($nameToGP[$dataset] !== null) {
         dataset($nameToGP[$dataset]);
@@ -95,10 +93,9 @@ $router->get('/entry/', function() {
     $nameToGP = [
         'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
         'Ghent' => new Datasets\GentParking\GhentToRDF(),
-        'IxorSint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
-        'IxorGhent' => new Datasets\Ixor\IxorGent(),
-        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
-        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
+        'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
+        'Leuven' => new Datasets\Ixor\IxorLeuven(),
+        'Mechelen' => new Datasets\Ixor\IxorMechelen()
     ];
     $result = array();
     foreach ($nameToGP as $name => $proc) {
