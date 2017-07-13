@@ -2,8 +2,10 @@
 This repo contains the PHP backend code for the Smart Flanders project.
 
 ## documentation
-### index.php
-Index.php contains a routing component, made to publish multiple independent datasets on the same server.
+### Interface
+- `/entry`: returns a JSON file with all the valid URLs of dataset hosted on this server.
+- `/parking/<city>`: returns the latest measurements of this city (dataset) in a Turtle file.
+- `/parking/<city>?time=YYYY-MM-DDTHH:mm:ss`: returns the most recent measurement file before the given timestamp.
 
 
 ### Adding new datasets
