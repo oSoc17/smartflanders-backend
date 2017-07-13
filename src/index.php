@@ -76,7 +76,7 @@ $router = new Router\Router();
 $router->get('/parking/(.*)', function($dataset){
     $nameToGP = [
         'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
-        'Ghent' => new Datasets\GentParking\GhentToRDF(),
+        'Gent' => new Datasets\GentParking\GhentToRDF(),
         'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
         'Leuven' => new Datasets\Ixor\IxorLeuven(),
         'Mechelen' => new Datasets\Ixor\IxorMechelen()
@@ -92,7 +92,7 @@ $router->get('/parking/(.*)', function($dataset){
 $router->get('/entry/', function() {
     $nameToGP = [
         'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
-        'Ghent' => new Datasets\GentParking\GhentToRDF(),
+        'Gent' => new Datasets\GentParking\GhentToRDF(),
         'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
         'Leuven' => new Datasets\Ixor\IxorLeuven(),
         'Mechelen' => new Datasets\Ixor\IxorMechelen()
