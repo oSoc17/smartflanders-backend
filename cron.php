@@ -30,7 +30,6 @@ function acquire_data() {
         new Datasets\ParkoKortrijk\ParkoToRDF(),
         new Datasets\GentParking\GhentToRDF(),
         new Datasets\Ixor\IxorMechelen(),
-        new Datasets\Ixor\IxorGent(),
         new Datasets\Ixor\IxorLeuven(),
         new Datasets\Ixor\IxorSintNiklaas()
     ];
