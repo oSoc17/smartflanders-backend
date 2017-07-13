@@ -8,6 +8,15 @@ use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use Tracy\Debugger;
 
+// This is used by the router. It contains all the necessary graph processors.
+$graph_processors = [
+    new Datasets\ParkoKortrijk\ParkoToRDF(),
+    new Datasets\GentParking\GhentToRDF(),
+    new Datasets\Ixor\IxorSintNiklaas(),
+    new Datasets\Ixor\IxorLeuven(),
+    new Datasets\Ixor\IxorMechelen()
+];
+
 //Tracy debugger
 Debugger::enable();
 
@@ -74,29 +83,33 @@ function dataset($graph_processor) {
 $router = new Router\Router();
 
 $router->get('/parking/(.*)', function($dataset){
-    $nameToGP = [
-        'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
-        'Gent' => new Datasets\GentParking\GhentToRDF(),
-        'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
-        'Leuven' => new Datasets\Ixor\IxorLeuven(),
-        'Mechelen' => new Datasets\Ixor\IxorMechelen()
-    ];
+    global $graph_processors;
+    $nameToGP = [];
+    foreach($graph_processors as $gp) {
+        $base_url = $gp->getBaseUrl();
+        preg_match('/\/parking\/(.*)/', $base_url, $matches);
+        $name = $matches[1];
+        $nameToGP[$name] = $gp;
+    }
+
     if ($nameToGP[$dataset] !== null) {
         dataset($nameToGP[$dataset]);
     } else {
         http_response_code(404);
-        die("Route not found");
+        die("Route not found: " + $dataset);
     }
 });
 
 $router->get('/entry/', function() {
-    $nameToGP = [
-        'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
-        'Gent' => new Datasets\GentParking\GhentToRDF(),
-        'Sint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
-        'Leuven' => new Datasets\Ixor\IxorLeuven(),
-        'Mechelen' => new Datasets\Ixor\IxorMechelen()
-    ];
+    global $graph_processors;
+    $nameToGP = [];
+    foreach($graph_processors as $gp) {
+        $base_url = $gp->getBaseUrl();
+        preg_match('/\/parking\/(.*)/', $base_url, $matches);
+        $name = $matches[1];
+        $nameToGP[$name] = $gp;
+    }
+
     $result = array();
     foreach ($nameToGP as $name => $proc) {
         array_push($result, $proc->getBaseUrl());

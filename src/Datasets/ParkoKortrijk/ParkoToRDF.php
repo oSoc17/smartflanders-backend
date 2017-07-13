@@ -72,7 +72,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
     public function getBaseUrl()
     {
-        return $this::BASE_URL;
+        return $this->publish_url;
     }
 
     public function getRealTimeMaxAge()
