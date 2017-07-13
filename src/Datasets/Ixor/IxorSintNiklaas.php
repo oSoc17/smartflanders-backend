@@ -1,18 +1,21 @@
 <?php
 
 namespace oSoc\Smartflanders\Datasets\Ixor;
+use Dotenv;
 
 class IxorSintNiklaas extends IxorToRDF
 {
     public function __construct()
     {
-        $fetch = "https://smartflanders.ixortalk.com/api/v1.2/parkings/Sint-Niklaas/";
-        $publish = "http://localhost:3000/dataset/IxorSint-Niklaas/";
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $fetch = $_ENV["IXOR_SINT-NIKLAAS_FETCH"];
+        $publish = $_ENV["IXOR_SINT-NIKLAAS_PUBLISH"];
         parent::__construct($fetch, $publish);
     }
 
     public function getName()
     {
-        return "IxorSint-Niklaas";
+        return "Sint-Niklaas";
     }
 }

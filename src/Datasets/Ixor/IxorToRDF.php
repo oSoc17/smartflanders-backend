@@ -2,20 +2,20 @@
 
 namespace oSoc\Smartflanders\Datasets\Ixor;
 use oSoc\Smartflanders\Helpers;
+use Dotenv;
 
 abstract class IxorToRDF implements Helpers\IGraphProcessor
 {
     private $fetch_url, $publish_url;
-    //private $fetch_url = "https://smartflanders.ixortalk.com/api/v1.2/parkings/Sint-Niklaas";
-    //private $publish_url = "http://localhost:3000/dataset/Sint-Niklaas/";
-    private $authHeader = ['auth' =>
-        ['smartflanders', 'ySbwmmALC2z4cirWsEs8']
-    ];
+    private $authHeader;
 
     public function __construct($fetch_url, $publish_url)
     {
         $this->fetch_url = $fetch_url;
         $this->publish_url = $publish_url;
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $this->authHeader = ['auth' => [$_ENV['IXOR_AUTH_UNAME'], $_ENV['IXOR_AUTH_PWD']]];
     }
 
     public function getDynamicGraph()
