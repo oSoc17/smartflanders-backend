@@ -3,23 +3,31 @@
 namespace oSoc\Smartflanders\Datasets\ParkoKortrijk;
 
 use oSoc\Smartflanders\Helpers;
+use Dotenv;
 
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
-    private static $url = "http://193.190.76.149:81/ParkoParkings/counters.php";
-    const BASE_URL = "http://localhost:3000/dataset/Kortrijk";
+    private $publish_url, $fetch_url;
+
+    public function __construct()
+    {
+        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
+        $dotenv->load();
+        $this->publish_url = $_ENV['PARKO_KORTRIJK_PUBLISH'];
+        $this->fetch_url = $_ENV['PARKO_KORTRIJK_FETCH'];
+    }
 
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = self::BASE_URL . "?time=" . $time;
+        $graphname = $this->publish_url . "?time=" . $time;
 
         $graph = [
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
             'triples' => []
         ];
 
-        $xmldoc = Helpers\RequestHelper::getXML(self::$url);
+        $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
             $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
@@ -49,7 +57,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             'triples' => []
         ];
 
-        $xmldoc = Helpers\RequestHelper::getXML(self::$url);
+        $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         foreach ($xmldoc->parking as $parking) {
             $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
