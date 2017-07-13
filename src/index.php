@@ -93,9 +93,9 @@ $router->get('/dataset/(.*)', function($dataset){
 
 $router->get('/entry/', function() {
     $nameToGP = [
-        'Kortrijk' => new ParkoToRDF(),
-        'Ghent' => new GhentToRDF(),
-        'IxorSint-Niklaas' => new Ixor\IxorSintNiklaas(),
+        'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
+        'Ghent' => new Datasets\GentParking\GhentToRDF(),
+        'IxorSint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
         'IxorGhent' => new Datasets\Ixor\IxorGent(),
         'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
         'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
