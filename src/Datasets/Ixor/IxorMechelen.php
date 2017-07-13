@@ -13,6 +13,6 @@ class IxorMechelen extends IxorToRDF
 
     public function getName()
     {
-        return "IxorMechelen";
+        return "Mechelen";
     }
 }
