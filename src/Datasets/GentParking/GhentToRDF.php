@@ -6,8 +6,8 @@
  */
 
 namespace oSoc\Smartflanders\Datasets\GentParking;
-
 use oSoc\Smartflanders\Helpers;
+use Dotenv;
 
 Class GhentToRDF implements Helpers\IGraphProcessor
 {

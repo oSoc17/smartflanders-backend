@@ -1,6 +1,7 @@
 <?php
 
 namespace oSoc\Smartflanders\Datasets\Ixor;
+use Dotenv;
 
 class IxorLeuven extends IxorToRDF
 {
@@ -8,8 +9,8 @@ class IxorLeuven extends IxorToRDF
     {
         $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
         $dotenv->load();
-        $fetch = $_ENV["IXOR_LEUVEN_PUBLISH"];
-        $publish = $_ENV["IXOR_LEUVEN_FETCH"];
+        $fetch = $_ENV["IXOR_LEUVEN_FETCH"];
+        $publish = $_ENV["IXOR_LEUVEN_PUBLISH"];
         parent::__construct($fetch, $publish);
     }
 
