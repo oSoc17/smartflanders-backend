@@ -17,6 +17,14 @@ $graph_processors = [
     new Datasets\Ixor\IxorMechelen()
 ];
 
+$nameToGP = [];
+foreach($graph_processors as $gp) {
+    $base_url = $gp->getBaseUrl();
+    preg_match('/\/parking\/(.*)\//', $base_url, $matches);
+    $name = $matches[1];
+    $nameToGP[$name] = $gp;
+}
+
 //Tracy debugger
 Debugger::enable();
 
@@ -82,34 +90,23 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/parking/(.*)', function($dataset){
-    global $graph_processors;
-    $nameToGP = [];
-    foreach($graph_processors as $gp) {
-        $base_url = $gp->getBaseUrl();
-        preg_match('/\/parking\/(.*)/', $base_url, $matches);
-        $name = $matches[1];
-        $nameToGP[$name] = $gp;
+$router->get('/parking/(.*)/', function($dataset){
+    global $nameToGP;
+    $found = false;
+    foreach($nameToGP as $name => $gp) {
+        if ($name === $dataset) {
+            dataset($nameToGP[$name]);
+            $found = true;
+        }
     }
-
-    if ($nameToGP[$dataset] !== null) {
-        dataset($nameToGP[$dataset]);
-    } else {
+    if (!$found) {
         http_response_code(404);
         die("Route not found: " + $dataset);
     }
 });
 
 $router->get('/entry/', function() {
-    global $graph_processors;
-    $nameToGP = [];
-    foreach($graph_processors as $gp) {
-        $base_url = $gp->getBaseUrl();
-        preg_match('/\/parking\/(.*)/', $base_url, $matches);
-        $name = $matches[1];
-        $nameToGP[$name] = $gp;
-    }
-
+    global $nameToGP;
     $result = array();
     foreach ($nameToGP as $name => $proc) {
         array_push($result, $proc->getBaseUrl());

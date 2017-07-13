@@ -67,7 +67,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     }
 
     public function getName() {
-        return "Parko";
+        return "Kortrijk";
     }
 
     public function getBaseUrl()
