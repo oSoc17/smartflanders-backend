@@ -90,10 +90,12 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/parking/(.*)/', function($dataset){
+$router->get('/parking', function(){
     global $nameToGP;
     $found = false;
-    foreach($nameToGP as $name => $gp) {
+    $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
+    echo $dataset;
+    /*foreach($nameToGP as $name => $gp) {
         if ($name === $dataset) {
             dataset($nameToGP[$name]);
             $found = true;
@@ -102,7 +104,7 @@ $router->get('/parking/(.*)/', function($dataset){
     if (!$found) {
         http_response_code(404);
         die("Route not found: " + $dataset);
-    }
+    }*/
 });
 
 $router->get('/entry/', function() {
