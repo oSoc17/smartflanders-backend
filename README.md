@@ -8,12 +8,6 @@ Note that some parameters in the project are stored in a `.env` file (https://gi
 The `.env` file is not included in the repository because some of these parameters are confidential. However,
 we have provided an example `.env` file. To use it, run `cp .env.example .env`.
 This will make the Gent and Kortrijk datasets work (see further for hosting details).
-
-```
-PARKO_KORTRIJK_FETCH="http://193.190.76.149:81/ParkoParkings/counters.php"
-GHENT_PUBLISH="http://gent.smartflanders.com/parking"
-PARKO_KORTRIJK_PUBLISH="http://kortrijk.smartflanders.com/parking"
-```
  
 ### Gathering
 The file `cron.php` is set up to gather data from the available datasets. To activate the data gathering, add
@@ -59,7 +53,7 @@ so it will be visible to the public.
 headers of the dataset.
 
 ### 2) Adding the graph processor to the cron file
-In order for the cron job to gather data for the new dataset, it's graph processor must be added to `cron.php` in the
+In order for the cron job to gather data for the new dataset, its graph processor must be added to `cron.php` in the
 variable `$processors`.
 
 ### 3) Publishing the dataset
