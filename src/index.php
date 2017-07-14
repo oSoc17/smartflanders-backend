@@ -8,6 +8,22 @@ use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use Tracy\Debugger;
 
+// This is used by the router. It contains all the necessary graph processors.
+$graph_processors = [
+    new Datasets\ParkoKortrijk\ParkoToRDF(),
+    new Datasets\GentParking\GhentToRDF(),
+    new Datasets\Ixor\IxorSintNiklaas(),
+    new Datasets\Ixor\IxorLeuven(),
+    new Datasets\Ixor\IxorMechelen()
+];
+
+$nameToGP = [];
+foreach($graph_processors as $gp) {
+    $name = $gp->getName();
+    $name_lower = strtolower($name);
+    $nameToGP[$name_lower] = $gp;
+}
+
 //Tracy debugger
 Debugger::enable();
 
@@ -19,7 +35,6 @@ Debugger::enable();
  * @param $graph_processor
  */
 function dataset($graph_processor) {
-    echo "dataset";
     $out_dirname = __DIR__ . "/../out";
     $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
@@ -74,32 +89,24 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/dataset/(.*)', function($dataset){
-    $nameToGP = [
-        'Kortrijk' => new Datasets\ParkoKortrijk\ParkoToRDF(),
-        'Ghent' => new Datasets\GentParking\GhentToRDF(),
-        'IxorSint-Niklaas' => new Datasets\Ixor\IxorSintNiklaas(),
-        'IxorGhent' => new Datasets\Ixor\IxorGent(),
-        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
-        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
-    ];
-    if ($nameToGP[$dataset] !== null) {
-        dataset($nameToGP[$dataset]);
-    } else {
+$router->get('/parking', function(){
+    global $nameToGP;
+    $found = false;
+    $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
+    foreach($nameToGP as $name => $gp) {
+        if ($name === $dataset) {
+            dataset($nameToGP[$name]);
+            $found = true;
+        }
+    }
+    if (!$found) {
         http_response_code(404);
-        die("Route not found");
+        die("Route not found: " + $dataset);
     }
 });
 
-$router->get('/entry/', function() {
-    $nameToGP = [
-        'Kortrijk' => new ParkoToRDF(),
-        'Ghent' => new GhentToRDF(),
-        'IxorSint-Niklaas' => new Ixor\IxorSintNiklaas(),
-        'IxorGhent' => new Datasets\Ixor\IxorGent(),
-        'IxorLeuven' => new Datasets\Ixor\IxorLeuven(),
-        'IxorMechelen' => new Datasets\Ixor\IxorMechelen()
-    ];
+$router->get('/entry', function() {
+    global $nameToGP;
     $result = array();
     foreach ($nameToGP as $name => $proc) {
         array_push($result, $proc->getBaseUrl());
