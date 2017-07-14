@@ -19,10 +19,9 @@ $graph_processors = [
 
 $nameToGP = [];
 foreach($graph_processors as $gp) {
-    $base_url = $gp->getBaseUrl();
-    preg_match('/\/parking\/(.*)\//', $base_url, $matches);
-    $name = $matches[1];
-    $nameToGP[$name] = $gp;
+    $name = $gp->getName();
+    $name_lower = strtolower($name);
+    $nameToGP[$name_lower] = $gp;
 }
 
 //Tracy debugger
@@ -94,8 +93,7 @@ $router->get('/parking', function(){
     global $nameToGP;
     $found = false;
     $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
-    echo $dataset;
-    /*foreach($nameToGP as $name => $gp) {
+    foreach($nameToGP as $name => $gp) {
         if ($name === $dataset) {
             dataset($nameToGP[$name]);
             $found = true;
@@ -104,10 +102,10 @@ $router->get('/parking', function(){
     if (!$found) {
         http_response_code(404);
         die("Route not found: " + $dataset);
-    }*/
+    }
 });
 
-$router->get('/entry/', function() {
+$router->get('/entry', function() {
     global $nameToGP;
     $result = array();
     foreach ($nameToGP as $name => $proc) {
