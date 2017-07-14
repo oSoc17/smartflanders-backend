@@ -1,3 +1,3 @@
 #!/bin/bash
 
-php -S localhost:3000 -t src/
+php -S 127.0.0.1:80 -t src/
