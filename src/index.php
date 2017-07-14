@@ -19,10 +19,9 @@ $graph_processors = [
 
 $nameToGP = [];
 foreach($graph_processors as $gp) {
-    $base_url = $gp->getBaseUrl();
-    preg_match('/\/parking\/(.*)\//', $base_url, $matches);
-    $name = $matches[1];
-    $nameToGP[$name] = $gp;
+    $name = $gp->getName();
+    $name_lower = strtolower($name);
+    $nameToGP[$name_lower] = $gp;
 }
 
 //Tracy debugger
@@ -90,9 +89,10 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/parking/(.*)/', function($dataset){
+$router->get('/parking', function(){
     global $nameToGP;
     $found = false;
+    $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
     foreach($nameToGP as $name => $gp) {
         if ($name === $dataset) {
             dataset($nameToGP[$name]);
@@ -105,7 +105,7 @@ $router->get('/parking/(.*)/', function($dataset){
     }
 });
 
-$router->get('/entry/', function() {
+$router->get('/entry', function() {
     global $nameToGP;
     $result = array();
     foreach ($nameToGP as $name => $proc) {
