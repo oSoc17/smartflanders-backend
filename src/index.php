@@ -7,15 +7,25 @@ require __DIR__ . '/../vendor/autoload.php';
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use Tracy\Debugger;
+use Dotenv\Dotenv;
 
 // This is used by the router. It contains all the necessary graph processors.
 $graph_processors = [
     new Datasets\ParkoKortrijk\ParkoToRDF(),
     new Datasets\GentParking\GhentToRDF(),
-    new Datasets\Ixor\IxorSintNiklaas(),
-    new Datasets\Ixor\IxorLeuven(),
-    new Datasets\Ixor\IxorMechelen()
 ];
+
+$dotenv = new Dotenv(__DIR__ . '/../');
+$dotenv->load();
+if (array_key_exists("IXOR_LEUVEN_FETCH", $_ENV)) {
+    array_push($graph_processors, new Datasets\Ixor\IxorLeuven());
+}
+if (array_key_exists("IXOR_MECHELEN_FETCH", $_ENV)) {
+    array_push($graph_processors, new Datasets\Ixor\IxorMechelen());
+}
+if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
+    array_push($graph_processors, new Datasets\Ixor\IxorSintNiklaas());
+}
 
 $nameToGP = [];
 foreach($graph_processors as $gp) {
@@ -101,7 +111,7 @@ $router->get('/parking', function(){
     }
     if (!$found) {
         http_response_code(404);
-        die("Route not found: " + $dataset);
+        die("Route not found: " . $dataset);
     }
 });
 

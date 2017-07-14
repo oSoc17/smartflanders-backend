@@ -5,8 +5,8 @@ This repo contains the PHP backend code for the Smart Flanders project.
 To install the project, run `composer install`.
 
 Note that some parameters in the project are stored in a `.env` file (https://github.com/vlucas/phpdotenv).
-The `.env` file is not included in the repository because some of these parameters are confidential. The following
-reduced `.env` file contains parameters that are publicly available, add it to the project root to test the server.
+The `.env` file is not included in the repository because some of these parameters are confidential. However,
+we have provided an example `.env` file. To use it, run `cp .env.example .env`.
 This will make the Gent and Kortrijk datasets work (see further for hosting details).
 
 ```
@@ -23,15 +23,16 @@ the following line to your crontab (`crontab -e`):
 ```
  
 ### Local testing
+Make sure you've set up data gathering before running any servers. Without files, nothing can be hosted.
 A test server can be hosted as follows:
 ```
 php -S 127.0.0.1:80 -t src/
 ```
 The server reads the subdomain to determine the dataset that needs to be returned (this subdomain must be the dataset
 name in lower case, see 'Adding new datasets'). In order to test locally, a url needs to be added to `/etc/hosts` for
-each dataset, e.g.:
+each dataset. For the example .env file, this is as follows:
 ```
-127.0.0.1 localhost dataset1.test.com dataset2.test.com
+127.0.0.1 localhost gent.smartflanders.com kortrijk.smartflanders.com smartflanders.com
 ```
 
 ## Interface
@@ -58,6 +59,8 @@ so it will be visible to the public.
 headers of the dataset.
 
 ### 2) Adding the graph processor to the cron file
+In order for the cron job to gather data for the new dataset, it's graph processor must be added to `cron.php` in the
+variable `$processors`.
 
 ### 3) Publishing the dataset
 There are two ways in which a new dataset can be published: either it will be published on its own (no router needed),
