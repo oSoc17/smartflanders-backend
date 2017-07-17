@@ -20,7 +20,7 @@ the following line to your crontab (`crontab -e`):
 ```
 * * * * * /bin/php [INSTALLATION_FOLDER]/cron.php 1>> /dev/null 2>&1
 ```
- 
+
 ### Local testing
 Make sure you've set up data gathering before running any servers. Without files, nothing can be hosted.
 A test server can be hosted as follows:
@@ -38,7 +38,6 @@ each dataset. For the example .env file, this is as follows:
 - `/entry`: returns a JSON file with all the valid URLs of dataset hosted on this server.
 - `<city>.<domain>/parking`: returns the latest measurements of this city (dataset) in a Turtle file.
 - `<city>.<domain>/parking?time=YYYY-MM-DDTHH:mm:ss`: returns the most recent measurement file before the given timestamp.
-
 
 ## Adding new datasets
 ### 1) Implementing the Graph Processor

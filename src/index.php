@@ -49,6 +49,22 @@ foreach($processors as $gp) {
     $nameToGP[$name_lower] = $gp;
 }
 
+// This is used by the router. It contains all the necessary graph processors.
+$graph_processors = [
+    new Datasets\ParkoKortrijk\ParkoToRDF(),
+    new Datasets\GentParking\GhentToRDF(),
+    new Datasets\Ixor\IxorSintNiklaas(),
+    new Datasets\Ixor\IxorLeuven(),
+    new Datasets\Ixor\IxorMechelen()
+];
+
+$nameToGP = [];
+foreach($graph_processors as $gp) {
+    $name = $gp->getName();
+    $name_lower = strtolower($name);
+    $nameToGP[$name_lower] = $gp;
+}
+
 //Tracy debugger
 Debugger::enable();
 

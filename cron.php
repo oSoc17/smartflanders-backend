@@ -6,6 +6,7 @@ require __DIR__ . '/vendor/autoload.php';
 use oSoc\Smartflanders\Datasets;
 use oSoc\Smartflanders\Filesystem;
 use GO\Scheduler;
+use oSoc\Smartflanders\View;
 use Dotenv\Dotenv;
 // Scheduler setup
 // https://github.com/peppeocchi/php-cron-scheduler
