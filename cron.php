@@ -43,9 +43,9 @@ function acquire_data() {
     }*/
     $dotenv = new Dotenv(__DIR__);
     $dotenv->load();
-    $arr = explode(',', $_ENV["DATASETS"]);
+    $datasets = explode(',', $_ENV["DATASETS"]);
     $processors = array();
-    foreach($arr as $dataset) {
+    foreach($datasets as $dataset) {
         try {
             $dotenv->required($dataset . "_PATH");
             // TODO load classes from paths here, push object instances in $processors
