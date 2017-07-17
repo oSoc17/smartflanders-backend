@@ -36,7 +36,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = $this->urls[self::BASE] . "?time=" . $time;
+        $graphname = $this->urls[self::BASE] . "?time=" . date("Y-m-d\TH:i:s", $time);
 
         $graph = self::preProcessing();
 
@@ -56,7 +56,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             array_push($multigraph['triples'], $triple);
         }
 
-        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
+        $gentime = '"' . date("Y-m-d\TH:i:s", $time) . '"^^http://www.w3.org/2001/XMLSchema#dateTime';
         $multigraph = Helpers\TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
 
         return $multigraph;

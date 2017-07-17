@@ -20,7 +20,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = $this->publish_url . "?time=" . $time;
+        $graphname = $this->publish_url . "?time=" . date("Y-m-d\TH:i:s", $time);
 
         $graph = [
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
@@ -30,7 +30,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
-            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces','"' . $parking['vrij'] . '"');
         }
 
@@ -45,7 +45,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             array_push($multigraph['triples'], $triple);
         }
 
-        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
+        $gentime = '"' . date("Y-m-d\TH:i:s", $time) . '"^^http://www.w3.org/2001/XMLSchema#dateTime';
         $multigraph = Helpers\TripleHelper::addTriple($multigraph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
 
         return $multigraph;
@@ -59,7 +59,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
         $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         foreach ($xmldoc->parking as $parking) {
-            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
         }
