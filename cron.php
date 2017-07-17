@@ -26,7 +26,7 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    $processors = [
+    /*$processors = [
         new Datasets\ParkoKortrijk\ParkoToRDF(),
         new Datasets\GentParking\GhentToRDF(),
     ];
@@ -40,6 +40,20 @@ function acquire_data() {
     }
     if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
         array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
+    }*/
+    $dotenv = new Dotenv(__DIR__);
+    $dotenv->load();
+    $arr = explode(',', $_ENV["DATASETS"]);
+    $processors = array();
+    foreach($arr as $dataset) {
+        try {
+            $dotenv->required($dataset . "_PATH");
+            // TODO load classes from paths here, push object instances in $processors
+
+        } catch (Exception $e) {
+            error_log("Invalid .env configuration: dataset " . $dataset . " was has no corresponding class path."
+            . " Please add the variable " . $dataset . "_PATH.");
+        }
     }
     foreach ($processors as $processor) {
         $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", 300, $processor);

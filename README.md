@@ -3,6 +3,11 @@ This repo contains the PHP backend code for the Smart Flanders project.
 
 ## Installation
 To install the project, run `composer install`.
+Make sure the `out` and `resources` directories are writable for the data gathering cron job (see further):
+```
+mkdir out resources
+chmod 777 out resources
+```
 
 Note that some parameters in the project are stored in a `.env` file (https://github.com/vlucas/phpdotenv).
 The `.env` file is not included in the repository because some of these parameters are confidential. However,
