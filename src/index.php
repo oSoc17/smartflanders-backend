@@ -7,18 +7,43 @@ require __DIR__ . '/../vendor/autoload.php';
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use Tracy\Debugger;
+use Dotenv\Dotenv;
 
 // This is used by the router. It contains all the necessary graph processors.
-$graph_processors = [
+/*$processors = [
     new Datasets\ParkoKortrijk\ParkoToRDF(),
     new Datasets\GentParking\GhentToRDF(),
-    new Datasets\Ixor\IxorSintNiklaas(),
-    new Datasets\Ixor\IxorLeuven(),
-    new Datasets\Ixor\IxorMechelen()
 ];
 
+$dotenv = new Dotenv(__DIR__ . '/../');
+$dotenv->load();
+if (array_key_exists("IXOR_LEUVEN_FETCH", $_ENV)) {
+    array_push($processors, new Datasets\Ixor\IxorLeuven());
+}
+if (array_key_exists("IXOR_MECHELEN_FETCH", $_ENV)) {
+    array_push($processors, new Datasets\Ixor\IxorMechelen());
+}
+if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
+    array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
+}*/
+
+$dotenv = new Dotenv(__DIR__ . '/../');
+$dotenv->load();
+$datasets = explode(',', $_ENV["DATASETS"]);
+$processors = array();
+foreach($datasets as $dataset) {
+    try {
+        $dotenv->required($dataset . "_PATH");
+        $class = $_ENV[$dataset . "_PATH"];
+        array_push($processors, new $class);
+    } catch (\Exception $e) {
+        error_log("Invalid .env configuration: dataset " . $dataset . " was has no corresponding class path."
+            . " Please add the variable " . $dataset . "_PATH.");
+    }
+}
+
 $nameToGP = [];
-foreach($graph_processors as $gp) {
+foreach($processors as $gp) {
     $name = $gp->getName();
     $name_lower = strtolower($name);
     $nameToGP[$name_lower] = $gp;
@@ -101,7 +126,7 @@ $router->get('/parking', function(){
     }
     if (!$found) {
         http_response_code(404);
-        die("Route not found: " + $dataset);
+        die("Route not found: " . $dataset);
     }
 });
 
