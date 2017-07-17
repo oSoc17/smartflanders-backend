@@ -100,10 +100,8 @@ Class FileSystemProcessor {
     // PRIVATE METHODS
 
     // Round a timestamp to its respective file timestamp
-    protected static function roundTimestamp($timestamp) {
-        $minutes = date('i', $timestamp);
-        $seconds = date('s', $timestamp);
-        $timestamp -= ($minutes%5)*60 + $seconds;
+    protected function roundTimestamp($timestamp) {
+        $timestamp -= $timestamp % $this->second_interval;
         return $timestamp;
     }
 

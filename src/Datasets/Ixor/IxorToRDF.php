@@ -21,7 +21,7 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
     public function getDynamicGraph()
     {
         $time = time();
-        $graphname = $this->publish_url . "?time=" . $time;
+        $graphname = $this->publish_url . "?time=" . date("Y-m-d\TH:i:s", $time);
         $graph = [
             'prefixes' => Helpers\TripleHelper::getPrefixes(),
             'triples' => []
@@ -29,11 +29,11 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
 
         $data = Helpers\RequestHelper::getJSON($this->fetch_url, $this->authHeader);
         foreach($data->parkings as $parking) {
-            $subject = $this->publish_url . str_replace(' ', '-', $parking->name);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking->name);
             $graph = Helpers\TripleHelper::addQuad($graph, $graphname, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $parking->availableCapacity . '"');
         }
 
-        $gentime = "\"$time\"^^http://www.w3.org/2001/XMLSchema#dateTime";
+        $gentime = '"' . date("Y-m-d\TH:i:s", $time) . '"^^http://www.w3.org/2001/XMLSchema#dateTime';
         $graph = Helpers\TripleHelper::addTriple($graph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
 
         return $graph;
@@ -47,7 +47,7 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
         ];
         $data = Helpers\RequestHelper::getJSON($this->fetch_url, $this->authHeader);
         foreach($data->parkings as $parking) {
-            $subject = $this->publish_url . str_replace(' ', '-', $parking->name);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking->name);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $parking->totalCapacity . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:lat', '"' . $parking->latitude . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:long', '"' . $parking->longitude . '"');
