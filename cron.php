@@ -44,7 +44,7 @@ function acquire_data() {
     }*/
     $dotenv = new Dotenv(__DIR__);
     $dotenv->load();
-    $datasets = explode(',', $_ENV["DATASETS"]);
+    $datasets = explode(',', $_ENV["DATASETS_GATHER"]);
     $processors = array();
     foreach($datasets as $dataset) {
         try {

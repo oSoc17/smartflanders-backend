@@ -29,6 +29,19 @@ if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
 
 $dotenv = new Dotenv(__DIR__ . '/../');
 $dotenv->load();
+$datasets_gather = explode(',', $_ENV["DATASETS_GATHER"]);
+$processors_gather = array();
+foreach($datasets_gather as $dataset) {
+    try {
+        $dotenv->required($dataset . "_PATH");
+        $class = $_ENV[$dataset . "_PATH"];
+        array_push($processors_gather, new $class);
+    } catch (\Exception $e) {
+        error_log("Invalid .env configuration: dataset " . $dataset . " was has no corresponding class path."
+            . " Please add the variable " . $dataset . "_PATH.");
+    }
+}
+
 $datasets = explode(',', $_ENV["DATASETS"]);
 $processors = array();
 foreach($datasets as $dataset) {
@@ -49,22 +62,6 @@ foreach($processors as $gp) {
     $nameToGP[$name_lower] = $gp;
 }
 
-// This is used by the router. It contains all the necessary graph processors.
-$graph_processors = [
-    new Datasets\ParkoKortrijk\ParkoToRDF(),
-    new Datasets\GentParking\GhentToRDF(),
-    new Datasets\Ixor\IxorSintNiklaas(),
-    new Datasets\Ixor\IxorLeuven(),
-    new Datasets\Ixor\IxorMechelen()
-];
-
-$nameToGP = [];
-foreach($graph_processors as $gp) {
-    $name = $gp->getName();
-    $name_lower = strtolower($name);
-    $nameToGP[$name_lower] = $gp;
-}
-
 //Tracy debugger
 Debugger::enable();
 
@@ -80,51 +77,69 @@ function dataset($graph_processor) {
     $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
 
-// If no preferred content type is specified, prefer turtle
-    if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
-        $_SERVER['HTTP_ACCEPT'] = 'text/turtle';
-    }
+    global $processors_gather;
 
-    $filename = null;
-
-    $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
-
-    if (!isset($_GET['page']) && !isset($_GET['time'])) {
-        $timestamp = $fs->getLastPage();
-        $filename = date("Y-m-d\TH:i:s", $timestamp);
-    }
-
-    else if (isset($_GET['page'])) {
-        // If page name is provided, it must be exact
-        $filename = strtotime($_GET['page']);
-        if (!$fs->hasFile($filename)) {
-            http_response_code(404);
-            die("Page not found");
+    if (in_array($graph_processor, $processors_gather)) {
+        // This data is being gathered here, get the file
+        // If no preferred content type is specified, prefer turtle
+        if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
+            $_SERVER['HTTP_ACCEPT'] = 'text/turtle';
         }
-    }
 
-    else if (isset($_GET['time'])) {
-        // If timestamp is provided, find latest file before timestamp
-        $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
-        $filename = date("Y-m-d\TH:i:s", $timestamp);
-        if (!$filename) {
-            http_response_code(404);
-            die("Time not found");
+        $filename = null;
+
+        $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+
+        if (!isset($_GET['page']) && !isset($_GET['time'])) {
+            $timestamp = $fs->getLastPage();
+            $filename = date("Y-m-d\TH:i:s", $timestamp);
         }
-    }
 
-    if (!isset($_GET['page'])) {
-        header("Access-Control-Allow-Origin: *");
-        header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $filename);
+        else if (isset($_GET['page'])) {
+            // If page name is provided, it must be exact
+            $filename = strtotime($_GET['page']);
+            if (!$fs->hasFile($filename)) {
+                http_response_code(404);
+                die("Page not found");
+            }
+        }
+
+        else if (isset($_GET['time'])) {
+            // If timestamp is provided, find latest file before timestamp
+            $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
+            $filename = date("Y-m-d\TH:i:s", $timestamp);
+            if (!$filename) {
+                http_response_code(404);
+                die("Time not found");
+            }
+        }
+
+        if (!isset($_GET['page'])) {
+            header("Access-Control-Allow-Origin: *");
+            header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $filename);
+        } else {
+            // This is sloppy coding
+            $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+            $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
+            $historic = true;
+            if ($filename === $fs->getLastPage()) {
+                $historic = false;
+            }
+            View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl(), $graph_processor->getRealTimeMaxAge());
+        }
     } else {
-        // This is sloppy coding
-        $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
-        $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
-        $historic = true;
-        if ($filename === $fs->getLastPage()) {
-            $historic = false;
+        // This data is not being gathered here, the base URL redirects to somewhere else
+        // Just copy arguments and redirect
+        if (isset($_GET['page'])) {
+            header("Access-Control-Allow-Origin: *");
+            header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $_GET['page']);
+        } else if (isset($_GET['time'])) {
+            header("Access-Control-Allow-Origin: *");
+            header('Location: ' . $graph_processor->getBaseUrl() . '?time=' . $_GET['time']);
+        } else {
+            header("Access-Control-Allow-Origin: *");
+            header('Location: ' . $graph_processor->getBaseUrl());
         }
-        View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl(), $graph_processor->getRealTimeMaxAge());
     }
 }
 
