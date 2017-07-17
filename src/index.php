@@ -90,12 +90,13 @@ function dataset($graph_processor) {
     $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
 
     if (!isset($_GET['page']) && !isset($_GET['time'])) {
-        $filename = $fs->getLastPage();
+        $timestamp = $fs->getLastPage();
+        $filename = date("Y-m-d\TH:i:s", $timestamp);
     }
 
     else if (isset($_GET['page'])) {
         // If page name is provided, it must be exact
-        $filename = $_GET['page'];
+        $filename = strtotime($_GET['page']);
         if (!$fs->hasFile($filename)) {
             http_response_code(404);
             die("Page not found");
@@ -104,7 +105,8 @@ function dataset($graph_processor) {
 
     else if (isset($_GET['time'])) {
         // If timestamp is provided, find latest file before timestamp
-        $filename = $fs->getClosestPage(strtotime($_GET['time']));
+        $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
+        $filename = date("Y-m-d\TH:i:s", $timestamp);
         if (!$filename) {
             http_response_code(404);
             die("Time not found");
