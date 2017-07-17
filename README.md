@@ -57,9 +57,13 @@ so it will be visible to the public.
 - `getRealTimeMaxAge()`: Return the amount of seconds the dynamic data can be cached. This will be put in the cache
 headers of the dataset.
 
-### 2) Adding the graph processor to the cron file
-In order for the cron job to gather data for the new dataset, its graph processor must be added to `cron.php` in the
-variable `$processors`.
+### 2) Adding the graph processor to the .env file
+In order for the cron job to gather data for the new dataset, it must be defined in the .env file.
+The following variables must be created/updated to add the new dataset:
+- `DATASETS`: contains a comma-separated list of dataset names. The name of the dataset must be added here (it is
+recommended to use the same name here as in `getName()`)
+- `[DATASET_NAME]_PATH`: Contains the fully classified class name for the given dataset. `[DATASET_NAME]` here must
+be the same name as added in `DATASETS`.
 
 ### 3) Publishing the dataset
 There are two ways in which a new dataset can be published: either it will be published on its own (no router needed),
@@ -71,7 +75,7 @@ for a single dataset can be found in `index-singular.php`. Here, you simply fill
 `$graph_processor` variable and point your server to the `src/` directory.
 
 #### Multiple datasets
-To add a new dataset to an existing group of datasets, the router needs to be used:
-- The router identifies datasets using subdomains (the first part of the domain must be a dataset name).
+To add a new dataset to an existing group of datasets, the router needs to be used.
+The router identifies datasets using subdomains (the first part of the domain must be a dataset name).
 This means that `getBaseUrl()` in the Graph Processor should return a URL starting with the dataset name.
-- An instance of the new graph processor should be added to the `$graph_processors` variable in `index.php` (at the top).
+Note that the relevant URLs must be added to `/etc/hosts` for local testing (see above: Local Testing).
