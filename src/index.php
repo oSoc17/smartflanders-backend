@@ -34,6 +34,8 @@ $processors = array();
 foreach($datasets as $dataset) {
     try {
         $dotenv->required($dataset . "_PATH");
+        $class = $_ENV[$dataset . "_PATH"];
+        array_push($processors, new $class);
     } catch (\Exception $e) {
         error_log("Invalid .env configuration: dataset " . $dataset . " was has no corresponding class path."
             . " Please add the variable " . $dataset . "_PATH.");
