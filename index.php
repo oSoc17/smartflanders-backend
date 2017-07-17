@@ -2,7 +2,7 @@
 
 namespace oSoc\Smartflanders;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
@@ -27,7 +27,7 @@ if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
     array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
 }*/
 
-$dotenv = new Dotenv(__DIR__ . '/../');
+$dotenv = new Dotenv(__DIR__);
 $dotenv->load();
 $datasets_gather = explode(',', $_ENV["DATASETS_GATHER"]);
 $processors_gather = array();
@@ -63,7 +63,7 @@ foreach($processors as $gp) {
 }
 
 //Tracy debugger
-Debugger::enable();
+//Debugger::enable();
 
 // TODO parameters need to be passed, they are now hardcoded in THIS class only .... (Router)
 
@@ -73,8 +73,8 @@ Debugger::enable();
  * @param $graph_processor
  */
 function dataset($graph_processor) {
-    $out_dirname = __DIR__ . "/../out";
-    $res_dirname = __DIR__ . "/../resources";
+    $out_dirname = __DIR__ . "/out";
+    $res_dirname = __DIR__ . "/resources";
     $second_interval = 300;
 
     global $processors_gather;
@@ -92,15 +92,15 @@ function dataset($graph_processor) {
 
         if (!isset($_GET['page']) && !isset($_GET['time'])) {
             $timestamp = $fs->getLastPage();
-            $filename = date("Y-m-d\TH:i:s", $timestamp);
+	    $filename = date("Y-m-d\TH:i:s", $timestamp);
         }
 
         else if (isset($_GET['page'])) {
             // If page name is provided, it must be exact
             $filename = strtotime($_GET['page']);
             if (!$fs->hasFile($filename)) {
-                http_response_code(404);
-                die("Page not found");
+                //http_response_code(404);
+                //die("Page not found");
             }
         }
 
@@ -109,8 +109,8 @@ function dataset($graph_processor) {
             $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
             $filename = date("Y-m-d\TH:i:s", $timestamp);
             if (!$filename) {
-                http_response_code(404);
-                die("Time not found");
+                //http_response_code(404);
+                //die("Time not found");
             }
         }
 
@@ -147,7 +147,9 @@ function dataset($graph_processor) {
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
 
-$router->get('/parking', function(){
+$router->set404(function() {echo "404 from router";});
+
+$router->get('/parking', function($arg){
     global $nameToGP;
     $found = false;
     $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
@@ -158,8 +160,8 @@ $router->get('/parking', function(){
         }
     }
     if (!$found) {
-        http_response_code(404);
-        die("Route not found: " . $dataset);
+        //http_response_code(404);
+	//die("Route not found: " . $dataset);
     }
 });
 

@@ -29,7 +29,7 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
 
         $data = Helpers\RequestHelper::getJSON($this->fetch_url, $this->authHeader);
         foreach($data->parkings as $parking) {
-            $subject = $this->publish_url . str_replace(' ', '-', $parking->name);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking->name);
             $graph = Helpers\TripleHelper::addQuad($graph, $graphname, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $parking->availableCapacity . '"');
         }
 
@@ -47,7 +47,7 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
         ];
         $data = Helpers\RequestHelper::getJSON($this->fetch_url, $this->authHeader);
         foreach($data->parkings as $parking) {
-            $subject = $this->publish_url . str_replace(' ', '-', $parking->name);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking->name);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $parking->totalCapacity . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:lat', '"' . $parking->latitude . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:long', '"' . $parking->longitude . '"');

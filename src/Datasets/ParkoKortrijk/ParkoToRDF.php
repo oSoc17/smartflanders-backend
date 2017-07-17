@@ -30,7 +30,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
         $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         //Process Parking Status messages (dynamic)
         foreach ($xmldoc->parking as $parking) {
-            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces','"' . $parking['vrij'] . '"');
         }
 
@@ -59,7 +59,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
 
         $xmldoc = Helpers\RequestHelper::getXML($this->fetch_url);
         foreach ($xmldoc->parking as $parking) {
-            $subject = "http://open.data/stub/parko/" . str_replace(' ', '-', $parking);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
         }
