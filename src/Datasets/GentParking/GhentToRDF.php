@@ -11,8 +11,8 @@ use Dotenv;
 
 Class GhentToRDF implements Helpers\IGraphProcessor
 {
-    const STATIC = 0;
-    const DYNAMIC = 1;
+    const STAT = 0;
+    const DYN = 1;
     const BASE = 2;
     private $urls;
 
@@ -24,8 +24,8 @@ Class GhentToRDF implements Helpers\IGraphProcessor
         $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
         $dotenv->load();
         $this->urls = [
-            self::STATIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
-            self::DYNAMIC => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
+            self::STAT => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
+            self::DYN => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
             self::BASE => $_ENV['GHENT_PUBLISH']
         ];
     }
@@ -40,7 +40,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
 
         $graph = self::preProcessing();
 
-        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::DYNAMIC]);
+        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::DYN]);
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingStatusPublication->parkingRecordStatus as $parkingStatus) {
             $subject = self::$parkingURIs[(string)$parkingStatus->parkingRecordReference["id"]];
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . (string)$parkingStatus->parkingOccupancy->parkingNumberOfVacantSpaces . '"');
@@ -74,7 +74,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
             $graph = Helpers\TripleHelper::addTriple($graph, $key, 'owl:sameAs', $val);
         }
 
-        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::STATIC]);
+        $xmldoc = Helpers\RequestHelper::getXML($this->urls[self::STAT]);
         //Process Parking data that does not change that often (Name, lat, long, etc. Static)
         foreach ($xmldoc->payloadPublication->genericPublicationExtension->parkingTablePublication->parkingTable->parkingRecord->parkingSite as $parking) {
             $subject = (string)self::$parkingURIs[(string)$parking["id"]];

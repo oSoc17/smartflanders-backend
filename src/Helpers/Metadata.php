@@ -30,7 +30,7 @@ Class Metadata
     public static function addCountsToGraph(&$multigraph, $base_url) {
 
         $triples = 0;
-        foreach ($multigraph as $quad) {
+        foreach ($multigraph["triples"] as $quad) {
             $triples++;
         }
         array_push($multigraph["triples"], [
