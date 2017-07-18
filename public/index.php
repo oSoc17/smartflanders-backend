@@ -2,7 +2,7 @@
 
 namespace oSoc\Smartflanders;
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
