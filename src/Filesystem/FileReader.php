@@ -20,7 +20,7 @@ class FileReader extends FileSystemProcessor {
         }
         $server = $this->graph_processor->getBaseUrl();
 
-        $file_subject = $server . "?page=" . $filename;
+        $file_subject = $server . "?page=" . date("Y-m-d\TH:i:s", $filename);
         $file_timestamp = intval($filename);
         $prev = $this->getPreviousFileFromTimestamp($file_timestamp);
         $next = $this->getNextFileFromTimestamp($file_timestamp);
@@ -58,7 +58,7 @@ class FileReader extends FileSystemProcessor {
     private function getNextFileFromTimestamp($timestamp) {
         $next_ts = $this->getNextTimestampForTimestamp($timestamp);
         if ($next_ts) {
-            return $next_ts;
+            return date("Y-m-d\TH:i:s", $next_ts);
         }
         return false;
     }
@@ -67,7 +67,7 @@ class FileReader extends FileSystemProcessor {
     private function getPreviousFileFromTimestamp($timestamp) {
         $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
-            return $prev_ts;
+            return date("Y-m-d\TH:i:s", $prev_ts);
         }
         return false;
     }
