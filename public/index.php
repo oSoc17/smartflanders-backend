@@ -9,25 +9,7 @@ use Bramus\Router;
 use Tracy\Debugger;
 use Dotenv\Dotenv;
 
-// This is used by the router. It contains all the necessary graph processors.
-/*$processors = [
-    new Datasets\ParkoKortrijk\ParkoToRDF(),
-    new Datasets\GentParking\GhentToRDF(),
-];
-
 $dotenv = new Dotenv(__DIR__ . '/../');
-$dotenv->load();
-if (array_key_exists("IXOR_LEUVEN_FETCH", $_ENV)) {
-    array_push($processors, new Datasets\Ixor\IxorLeuven());
-}
-if (array_key_exists("IXOR_MECHELEN_FETCH", $_ENV)) {
-    array_push($processors, new Datasets\Ixor\IxorMechelen());
-}
-if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
-    array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
-}*/
-
-$dotenv = new Dotenv(__DIR__);
 $dotenv->load();
 $datasets_gather = explode(',', $_ENV["DATASETS_GATHER"]);
 $processors_gather = array();
@@ -73,8 +55,8 @@ foreach($processors as $gp) {
  * @param $graph_processor
  */
 function dataset($graph_processor) {
-    $out_dirname = __DIR__ . "/out";
-    $res_dirname = __DIR__ . "/resources";
+    $out_dirname = __DIR__ . "/../out";
+    $res_dirname = __DIR__ . "/../resources";
     $second_interval = 300;
 
     global $processors_gather;
@@ -92,15 +74,15 @@ function dataset($graph_processor) {
 
         if (!isset($_GET['page']) && !isset($_GET['time'])) {
             $timestamp = $fs->getLastPage();
-	    $filename = date("Y-m-d\TH:i:s", $timestamp);
+	        $filename = date("Y-m-d\TH:i:s", $timestamp);
         }
 
         else if (isset($_GET['page'])) {
             // If page name is provided, it must be exact
             $filename = strtotime($_GET['page']);
             if (!$fs->hasFile($filename)) {
-                //http_response_code(404);
-                //die("Page not found");
+                http_response_code(404);
+                die("Page not found");
             }
         }
 
@@ -109,8 +91,8 @@ function dataset($graph_processor) {
             $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
             $filename = date("Y-m-d\TH:i:s", $timestamp);
             if (!$filename) {
-                //http_response_code(404);
-                //die("Time not found");
+                http_response_code(404);
+                die("Time not found");
             }
         }
 
@@ -149,7 +131,7 @@ $router = new Router\Router();
 
 $router->set404(function() {echo "404 from router";});
 
-$router->get('/parking', function($arg){
+$router->get('/parking', function(){
     global $nameToGP;
     $found = false;
     $dataset = explode('.', $_SERVER['HTTP_HOST'])[0];
@@ -160,18 +142,9 @@ $router->get('/parking', function($arg){
         }
     }
     if (!$found) {
-        //http_response_code(404);
-	//die("Route not found: " . $dataset);
+        http_response_code(404);
+	    die("Route not found: " . $dataset);
     }
-});
-
-$router->get('/entry', function() {
-    global $nameToGP;
-    $result = array();
-    foreach ($nameToGP as $name => $proc) {
-        array_push($result, $proc->getBaseUrl());
-    }
-    echo json_encode($result);
 });
 
 $router->run();
