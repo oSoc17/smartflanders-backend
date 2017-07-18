@@ -32,7 +32,7 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
             $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
             $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
             $vacant = $dynamic->status->vacantSpaces;
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"';
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
         }
 
         $multigraph = [
