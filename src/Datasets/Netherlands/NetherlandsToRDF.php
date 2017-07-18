@@ -29,9 +29,10 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
         $parkings = $this->getAccessibleParkings();
         foreach($parkings as $parking) {
-            $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking->name);
-            $vacant = $parking->status->vacantSpaces;
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"')
+            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
+            $vacant = $dynamic->status->vacantSpaces;
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"';
         }
 
         $multigraph = [
@@ -52,22 +53,34 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
     public function getStaticGraph()
     {
-        // TODO: Implement getStaticGraph() method.
+        $graph = [
+            'prefixes' => Helpers\TripleHelper::getPrefixes(),
+            'triples' => []
+        ];
+
+        $parkings = $this->getAccessibleParkings();
+        foreach($parkings as $parking) {
+            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . $dynamic->name . '"');
+        }
+        return $graph;
     }
 
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return "Netherlands";
     }
 
     public function getBaseUrl()
     {
-        // TODO: Implement getBaseUrl() method.
+        return $this->publish_url;
     }
 
     public function getRealTimeMaxAge()
     {
-        // TODO: Implement getRealTimeMaxAge() method.
+        return 30;
     }
 
     private function getAccessibleParkings() {
