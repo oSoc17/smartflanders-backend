@@ -33,7 +33,7 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
             $graph = Helpers\TripleHelper::addQuad($graph, $graphname, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $parking->availableCapacity . '"');
         }
 
-        $gentime = '"' . date("Y-m-d\TH:i:s", $time) . '"^^http://www.w3.org/2001/XMLSchema#dateTime';
+        $gentime = '"' . date('c', $time) . '"^^http://www.w3.org/2001/XMLSchema#dateTime';
         $graph = Helpers\TripleHelper::addTriple($graph, $graphname, "http://www.w3.org/ns/prov#generatedAtTime", $gentime);
 
         return $graph;
