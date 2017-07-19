@@ -13,8 +13,8 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
     {
         $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
         $dotenv->load();
-        $this->publish_url = $_ENV['NETHERLANDS_PUBLISH'];
-        $this->fetch_url = $_ENV['NETHERLANDS_FETCH'];
+        $this->publish_url = $_ENV['NEDERLAND_PUBLISH'];
+        $this->fetch_url = $_ENV['NEDERLAND_FETCH'];
     }
 
     public function getDynamicGraph()
