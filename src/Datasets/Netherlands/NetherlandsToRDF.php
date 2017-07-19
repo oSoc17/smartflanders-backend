@@ -64,6 +64,7 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
             $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . $dynamic->name . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $dynamic->status->parkingCapacity . '"');
         }
         return $graph;
     }

@@ -14,6 +14,7 @@ Class FileSystemProcessor {
     protected $writer;
     protected $graph_processor;
     protected $static_data_filename;
+    const REFRESH_STATIC = true;
 
     /**
      * @param mixed $out_dirname
@@ -33,12 +34,15 @@ Class FileSystemProcessor {
         $this->res_fs = new Filesystem($res_adapter);
         $this->graph_processor = $graph_processor;
         $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
-        if(!$this->res_fs->has($this->static_data_filename)){
+        if(!$this->res_fs->has($this->static_data_filename) || self::REFRESH_STATIC){
+            /*if (self::REFRESH_STATIC) {
+                $this->res_fs->delete($this->static_data_filename);
+            }*/
             $graph = $graph_processor->getStaticGraph();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
             $this->writer->addTriples($graph["triples"]);
-            $this->res_fs->write($this->static_data_filename, $this->writer->end());
+            $this->res_fs->put($this->static_data_filename, $this->writer->end());
         }
     }
 
