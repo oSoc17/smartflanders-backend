@@ -42,7 +42,7 @@ Class FileSystemProcessor {
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
             $this->writer->addTriples($graph["triples"]);
-            $this->res_fs->write($this->static_data_filename, $this->writer->end());
+            $this->res_fs->put($this->static_data_filename, $this->writer->end());
         }
     }
 
