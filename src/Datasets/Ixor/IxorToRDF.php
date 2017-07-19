@@ -51,6 +51,8 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $parking->totalCapacity . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:lat', '"' . $parking->latitude . '"');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'geo:long', '"' . $parking->longitude . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . $parking->name . '"');
         }
         return $graph;
     }

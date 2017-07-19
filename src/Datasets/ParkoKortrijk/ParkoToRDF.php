@@ -62,6 +62,7 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             $subject = $this->publish_url . '#' . str_replace(' ', '-', $parking);
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . (string)$parking . '"');
+            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . (string)$parking->attributes()['capaciteit'] . '"');
         }
         return $graph;
     }
