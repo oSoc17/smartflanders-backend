@@ -57,7 +57,7 @@ function acquire_data() {
         }
     }
     foreach ($processors as $processor) {
-        $interval = 60*60*12; // 12 hour interval results in files of a few 100 KB
+        $interval = 60*60*6; // 12 hour interval results in files of a few 100 KB
         $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
         $graph = $processor->getDynamicGraph();
         $fs->writeToFile(time(), $graph);
