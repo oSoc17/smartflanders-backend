@@ -35,6 +35,9 @@ Class FileSystemProcessor {
         $this->graph_processor = $graph_processor;
         $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
         if(!$this->res_fs->has($this->static_data_filename) || self::REFRESH_STATIC){
+            if (self::REFRESH_STATIC) {
+                $this->res_fs->delete($this->static_data_filename);
+            }
             $graph = $graph_processor->getStaticGraph();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
