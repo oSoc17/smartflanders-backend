@@ -1,6 +1,7 @@
 # Hide .env from repo
 .env
 
+log/*
 sandbox.php
 out/*
 resources/*
