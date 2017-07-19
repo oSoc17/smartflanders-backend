@@ -70,7 +70,7 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
     public function getName()
     {
-        return "Netherlands";
+        return "Nederland";
     }
 
     public function getBaseUrl()
