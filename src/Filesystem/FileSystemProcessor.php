@@ -14,7 +14,7 @@ Class FileSystemProcessor {
     protected $writer;
     protected $graph_processor;
     protected $static_data_filename;
-    const REFRESH_STATIC = true;
+    const REFRESH_STATIC = false;
 
     /**
      * @param mixed $out_dirname
