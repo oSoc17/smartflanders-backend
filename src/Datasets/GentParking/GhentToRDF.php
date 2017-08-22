@@ -98,7 +98,7 @@ Class GhentToRDF implements Helpers\IGraphProcessor
 
     public function getName()
     {
-        return "Gent";
+        return "Linked";
     }
 
     public function getBaseUrl()
