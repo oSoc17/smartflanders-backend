@@ -29,11 +29,13 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
         $parkings = $this->getAccessibleParkings();
         foreach($parkings as $parking) {
-            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl)
-                        ->parkingFacilityDynamicInformation;
-            $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
-            $vacant = $dynamic->facilityActualStatus->vacantSpaces;
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
+            $response = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            if ($response) {
+                $dynamic = $response->parkingFacilityDynamicInformation;
+                $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
+                $vacant = $dynamic->facilityActualStatus->vacantSpaces;
+                $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
+            }
         }
 
         $multigraph = [
