@@ -89,18 +89,4 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
     {
         return 30;
     }
-
-    private function getAccessibleParkings() {
-        $jsondoc = Helpers\RequestHelper::getJSON($this->fetch_url);
-        $data = $jsondoc->parkingFacilities;
-        $accessible_parkings = array();
-        foreach($data as $parking) {
-            if (array_key_exists('dynamicDataUrl', $parking)) {
-                if (!$parking->limitedAccess) {
-                    array_push($accessible_parkings, $parking);
-                }
-            }
-        }
-        return $accessible_parkings;
-    }
 }
