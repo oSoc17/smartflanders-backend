@@ -27,21 +27,6 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    /*$processors = [
-        new Datasets\ParkoKortrijk\ParkoToRDF(),
-        new Datasets\GentParking\GhentToRDF(),
-    ];
-    $dotenv = new Dotenv(__DIR__);
-    $dotenv->load();
-    if (array_key_exists("IXOR_LEUVEN_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorLeuven());
-    }
-    if (array_key_exists("IXOR_MECHELEN_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorMechelen());
-    }
-    if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
-    }*/
     $dotenv = new Dotenv(__DIR__);
     $dotenv->load();
     $datasets = explode(',', $_ENV["DATASETS_GATHER"]);

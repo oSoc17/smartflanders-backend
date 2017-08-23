@@ -29,9 +29,10 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
         $parkings = $this->getAccessibleParkings();
         foreach($parkings as $parking) {
-            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl)
+                        ->parkingFacilityDynamicInformation;
             $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
-            $vacant = $dynamic->status->vacantSpaces;
+            $vacant = $dynamic->facilityActualStatus->vacantSpaces;
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
         }
 
@@ -86,7 +87,7 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
     private function getAccessibleParkings() {
         $jsondoc = Helpers\RequestHelper::getJSON($this->fetch_url);
-        $data = $jsondoc->ParkingFacilities;
+        $data = $jsondoc->parkingFacilities;
         $accessible_parkings = array();
         foreach($data as $parking) {
             if (array_key_exists('dynamicDataUrl', $parking)) {
