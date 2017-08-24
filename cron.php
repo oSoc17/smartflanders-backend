@@ -27,21 +27,6 @@ if ($argc == 1) {
  * + triples for timestamp and filename of previous file
  */
 function acquire_data() {
-    /*$processors = [
-        new Datasets\ParkoKortrijk\ParkoToRDF(),
-        new Datasets\GentParking\GhentToRDF(),
-    ];
-    $dotenv = new Dotenv(__DIR__);
-    $dotenv->load();
-    if (array_key_exists("IXOR_LEUVEN_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorLeuven());
-    }
-    if (array_key_exists("IXOR_MECHELEN_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorMechelen());
-    }
-    if (array_key_exists("IXOR_SINT-NIKLAAS_FETCH", $_ENV)) {
-        array_push($processors, new Datasets\Ixor\IxorSintNiklaas());
-    }*/
     $dotenv = new Dotenv(__DIR__);
     $dotenv->load();
     $datasets = explode(',', $_ENV["DATASETS_GATHER"]);
@@ -57,9 +42,11 @@ function acquire_data() {
         }
     }
     foreach ($processors as $processor) {
-        $interval = 60*60*3; // 3 hour interval results in files of a few 100 KB
-        $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
-        $graph = $processor->getDynamicGraph();
-        $fs->writeToFile(time(), $graph);
+        if ($processor->mustQuery()) {
+            $interval = 60*60*3; // 3 hour interval results in files of a few 100 KB
+            $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
+            $graph = $processor->getDynamicGraph();
+            $fs->writeToFile(time(), $graph);
+        }
     }
 }
