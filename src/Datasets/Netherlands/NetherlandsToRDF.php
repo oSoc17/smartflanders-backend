@@ -3,11 +3,13 @@
 namespace oSoc\Smartflanders\Datasets\Netherlands;
 use oSoc\Smartflanders\Helpers;
 use Dotenv;
+use \League\Flysystem\Adapter\Local;
+use \League\Flysystem\Filesystem;
 
 class NetherlandsToRDF implements Helpers\IGraphProcessor
 {
 
-    private $publish_url, $fetch_url;
+    private $publish_url, $fetch_url, $res_fs;
 
     public function __construct()
     {
@@ -15,6 +17,9 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
         $dotenv->load();
         $this->publish_url = $_ENV['NEDERLAND_PUBLISH'];
         $this->fetch_url = $_ENV['NEDERLAND_FETCH'];
+        // TODO this is a bad dependency. Resources directory should be added to .env.
+        $res_adapter = new Local(__DIR__ . '/../../../resources');
+        $this->res_fs = new Filesystem($res_adapter);
     }
 
     public function getDynamicGraph()
@@ -86,6 +91,20 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
     public function mustQuery()
     {
+        $filename = 'Nederland_last_measurement';
+        $now = time();
+        if ($this->res_fs->has($filename)) {
+            $string_value = $this->res_fs->read($filename);
+            $int_value = intval($string_value);
+            if ($now - $int_value > 30*60) {
+                // Only query once every 30 minutes
+                $this->res_fs->put($filename, $now);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        $this->res_fs->write($filename, $now);
         return true;
     }
 
