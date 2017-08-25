@@ -111,6 +111,11 @@ Class GhentToRDF implements Helpers\IGraphProcessor
         return 30;
     }
 
+    public function mustQuery()
+    {
+        return true;
+    }
+
     /**
      * @return array
      * Use this method to add content to both the dynamic and the static files

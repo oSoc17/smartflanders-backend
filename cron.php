@@ -42,9 +42,12 @@ function acquire_data() {
         }
     }
     foreach ($processors as $processor) {
-        $interval = 60*60*3; // 3 hour interval results in files of a few 100 KB
-        $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
-        $graph = $processor->getDynamicGraph();
-        $fs->writeToFile(time(), $graph);
+        if ($processor->mustQuery()) {
+            $interval = 60*60*3; // 3 hour interval results in files of a few 100 KB
+            // TODO add out and resources directories to .env. Right now Dutch dataset class has dependency on this.
+            $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
+            $graph = $processor->getDynamicGraph();
+            $fs->writeToFile(time(), $graph);
+        }
     }
 }
