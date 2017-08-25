@@ -32,12 +32,15 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
             'triples' => []
         ];
 
-        $parkings = $this->getAccessibleParkings();
+        $parkings = Helpers\RequestHelper::getJSON($this->fetch_url)->parkingFacilities;
         foreach($parkings as $parking) {
-            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
-            $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
-            $vacant = $dynamic->status->vacantSpaces;
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
+            $response = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            if ($response) {
+                $dynamic = $response->parkingFacilityDynamicInformation;
+                $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
+                $vacant = $dynamic->facilityActualStatus->vacantSpaces;
+                $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces', '"' . $vacant . '"');
+            }
         }
 
         $multigraph = [
@@ -63,13 +66,16 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
             'triples' => []
         ];
 
-        $parkings = $this->getAccessibleParkings();
+        $parkings = Helpers\RequestHelper::getJSON($this->fetch_url)->parkingFacilities;
         foreach($parkings as $parking) {
-            $dynamic = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
-            $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . $dynamic->name . '"');
-            $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $dynamic->status->parkingCapacity . '"');
+            $response = Helpers\RequestHelper::getJSON($parking->dynamicDataUrl);
+            if ($response) {
+                $dynamic = $response->parkingFacilityDynamicInformation;
+                $subject = $this->publish_url . '#' . str_replace(' ', '-', $dynamic->name);
+                $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdf:type', 'http://vocab.datex.org/terms#UrbanParkingSite');
+                $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'rdfs:label', '"' . $dynamic->name . '"');
+                $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfSpaces', '"' . $dynamic->facilityActualStatus->parkingCapacity . '"');
+            }
         }
         return $graph;
     }
