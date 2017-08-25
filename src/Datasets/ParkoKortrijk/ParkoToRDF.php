@@ -80,4 +80,9 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     {
         return 30;
     }
+
+    public function mustQuery()
+    {
+        return true;
+    }
 }

@@ -8,13 +8,23 @@ class RequestHelper
 {
     public static function getXML($url, $headers=[]) {
         $client = new Client();
-        $res = $client->request('GET', $url, $headers);
-        return new \SimpleXMLElement($res->getBody());
+        try {
+            $res = $client->request('GET', $url, $headers);
+            return new \SimpleXMLElement($res->getBody());
+        } catch (\Exception $e) {
+            echo "Client exception when requesting " . $url . "\n";
+            return false;
+        }
     }
 
     public static function getJSON($url, $headers=[]) {
         $client = new Client();
-        $res = $client->request('GET', $url, $headers);
-        return json_decode($res->getBody());
+        try {
+            $res = $client->request('GET', $url, $headers);
+            return json_decode($res->getBody());
+        } catch (\Exception $e) {
+            echo "Client exception when requesting " . $url . "\n";
+            return false;
+        }
     }
 }

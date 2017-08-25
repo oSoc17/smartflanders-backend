@@ -8,4 +8,5 @@ Interface IGraphProcessor {
     public function getName();
     public function getBaseUrl();
     public function getRealTimeMaxAge();
+    public function mustQuery();
 }
