@@ -104,7 +104,7 @@ function dataset($graph_processor) {
             $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
             $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
             $historic = true;
-            if ($filename === $fs->getLastPage()) {
+            if ((string)$filename === $fs->getLastPage()) {
                 $historic = false;
             }
             View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl(), $graph_processor->getRealTimeMaxAge());
