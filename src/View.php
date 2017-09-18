@@ -21,7 +21,7 @@ Class View
     private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
-        $priorities = array('text/turtle','application/rdf+xml');
+        $priorities = array('text/turtle','application/xml');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
         $value = $mediaType->getValue();
         header("Content-type: $value");
@@ -47,15 +47,21 @@ Class View
      */
     public static function view($acceptHeader, $graph, $historic, $base_url, $rt_max_age){
         $value = self::headers($acceptHeader, $historic, $rt_max_age);
-        $writer = new TriGWriter(["format" => $value]);
         $metadata = Helpers\Metadata::get($base_url);
         foreach ($metadata as $quad) {
             array_push($graph["triples"], $quad);
         }
         Helpers\Metadata::addMeasurementMetadata($graph);
         Helpers\Metadata::addCountsToGraph($graph, $base_url);
-        $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
-        $writer->addTriples($graph["triples"]);
-        echo $writer->end();
+
+        if ($value === 'text/turtle') {
+            $writer = new TriGWriter(["format" => $value]);
+            $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+            $writer->addTriples($graph["triples"]);
+            echo $writer->end();
+        } else if ($value === 'application/xml') {
+            $writer = new Helpers\DatexSerializer();
+            echo "<p>Hello this is XML</p>";
+        }
     }
 }
