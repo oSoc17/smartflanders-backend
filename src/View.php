@@ -36,7 +36,7 @@ Class View
         header("Access-Control-Allow-Origin: *");
 
         //As we have content negotiation on this document, don’t cache different representations on one URL hash key
-        header("Vary: accept");
+        header("Vary: Accept");
         return $value;
     }
 
