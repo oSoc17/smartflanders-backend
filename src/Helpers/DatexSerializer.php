@@ -32,9 +32,9 @@ class DatexSerializer
                                     )
                                 )
                             ),
-                            'parkingTableVersionTime' => 'TIMESTAMP', // Current ISO time goes here
+                            'parkingTableVersionTime' => date('c'), // Current ISO time goes here
                             'parkingRecord' => array(
-                                '@attributes' => array('xsi:type' => 'GroupOfParkingSites', 'id' => 'URL'), // Document URL goes here
+                                '@attributes' => array('xsi:type' => 'GroupOfParkingSites'), // Document URL goes here
                                 'parkingSite' => array()
                             )
                         )
@@ -50,6 +50,7 @@ class DatexSerializer
         $static_data = array();
         $measurements = array();
         $gentimes = array();
+        $document = '';
 
         // Search for rdf:type datex:UrbanParkingSite, add as keys
         foreach($triples as $triple) {
@@ -59,6 +60,10 @@ class DatexSerializer
                     $static_data[$triple['subject']] = array();
                     $measurements[$triple['subject']] = array();
                 }
+            } else if ($triple['predicate'] === 'void:triples') {
+                $document = $triple['subject'];
+                $this->array['payloadPublication']['genericPublicationExtension']['parkingTablePublication']
+                            ['parkingTable']['parkingRecord']['@attributes']['id'] = $document;
             }
         }
 
