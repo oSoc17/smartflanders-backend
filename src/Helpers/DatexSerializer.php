@@ -2,6 +2,8 @@
 
 namespace oSoc\Smartflanders\Helpers;
 
+use pietercolpaert\hardf\Util;
+
 class DatexSerializer
 {
     private $array;
@@ -51,6 +53,7 @@ class DatexSerializer
         $parkings = array();
         $static_data = array();
         $measurements = array();
+        $gentimes = array();
 
         // Search for rdf:type datex:UrbanParkingSite, add as keys
         foreach($triples as $triple) {
@@ -58,18 +61,48 @@ class DatexSerializer
                 if ($triple['object'] === 'http://vocab.datex.org/terms#UrbanParkingSite') {
                     array_push($parkings, $triple['subject']);
                     $static_data[$triple['subject']] = array();
+                    $measurements[$triple['subject']] = array();
                 }
             }
         }
 
         // Sort triples into static and dynamic data
+        $static_predicates = array('http://www.w3.org/2000/01/rdf-schema#label',
+            'http://purl.org/dc/terms/',
+            'http://vocab.datex.org/terms#parkingNumberOfSpaces');
+        $dynamic__predicates = array('http://vocab.datex.org/terms#parkingNumberOfVacantSpaces');
+        $gentime_predicate = 'http://www.w3.org/ns/prov#generatedAtTime';
+
         foreach($triples as $triple) {
-            if (array_search($triple['subject'], $parkings)) {
-                array_push($static_data[$triple['subject']], $triple);
+            if (in_array($triple['subject'], $parkings)) {
+                if (in_array($triple['predicate'], $static_predicates)) {
+                    array_push($static_data[$triple['subject']], $triple);
+                } else if (in_array($triple['predicate'], $dynamic__predicates)) {
+                    array_push($measurements[$triple['subject']], $triple);
+                }
+            }
+            if ($triple['predicate'] === $gentime_predicate) {
+                $gentimes[$triple['subject']] = $triple['object'];
             }
         }
 
         // Insert into result array
+        foreach($measurements as $parking) {
+            foreach($parking as $measurement) {
+                $recordStatus = array(
+                    '@attributes' => array('xsi:type' => 'ParkingSiteStatus'),
+                    'parkingRecordReference' => array(
+                        '@attributes' => array('targetClass' => 'ParkingRecord', 'version' => '4', 'id' => $measurement['subject'])
+                    ),
+                    'parkingStatusOriginTime' => Util::getLiteralValue($gentimes[$measurement['graph']]),
+                    'parkingOccupancy' => array(
+                        'parkingNumberOfVacantSpaces' => $measurement['object']
+                    ),
+                    'parkingSiteStatus' => 'spacesAvailable', // TODO don't hardcode this!
+                );
+                array_push($this->array['payloadPublication']['genericPublicationExtension']['parkingStatusPublication'], $recordStatus);
+            }
+        }
     }
 
     public function serialize()

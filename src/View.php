@@ -62,7 +62,7 @@ Class View
         } else if ($value === 'application/xml') {
             $writer = new Helpers\DatexSerializer();
             $writer->addTriples($graph["triples"]);
-            //echo $writer->serialize();
+            echo $writer->serialize();
         }
     }
 }
