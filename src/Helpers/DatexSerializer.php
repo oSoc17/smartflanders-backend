@@ -35,11 +35,7 @@ class DatexSerializer
                             'parkingTableVersionTime' => 'TIMESTAMP', // Current ISO time goes here
                             'parkingRecord' => array(
                                 '@attributes' => array('xsi:type' => 'GroupOfParkingSites', 'id' => 'URL'), // Document URL goes here
-                                'parkingName' => array('values' => array('value' => array(
-                                    '@attributes' => array('lang' => 'nl'),
-                                    '@value' => 'STAD' // City name goes here
-                                ))),
-                                // Parking sites go here
+                                'parkingSite' => array()
                             )
                         )
                     ),
@@ -67,8 +63,9 @@ class DatexSerializer
         }
 
         // Sort triples into static and dynamic data
-        $static_predicates = array('http://www.w3.org/2000/01/rdf-schema#label',
-            'http://purl.org/dc/terms/',
+        $static_predicates = array(
+            'http://www.w3.org/2000/01/rdf-schema#label',
+            'http://purl.org/dc/terms/description',
             'http://vocab.datex.org/terms#parkingNumberOfSpaces');
         $dynamic__predicates = array('http://vocab.datex.org/terms#parkingNumberOfVacantSpaces');
         $gentime_predicate = 'http://www.w3.org/ns/prov#generatedAtTime';
@@ -86,7 +83,7 @@ class DatexSerializer
             }
         }
 
-        // Insert into result array
+        // Insert measurements into result array
         foreach($measurements as $parking) {
             foreach($parking as $measurement) {
                 $recordStatus = array(
@@ -96,12 +93,44 @@ class DatexSerializer
                     ),
                     'parkingStatusOriginTime' => Util::getLiteralValue($gentimes[$measurement['graph']]),
                     'parkingOccupancy' => array(
-                        'parkingNumberOfVacantSpaces' => $measurement['object']
+                        'parkingNumberOfVacantSpaces' => Util::getLiteralValue($measurement['object'])
                     ),
                     'parkingSiteStatus' => 'spacesAvailable', // TODO don't hardcode this!
                 );
                 array_push($this->array['payloadPublication']['genericPublicationExtension']['parkingStatusPublication'], $recordStatus);
             }
+        }
+
+        // Insert static data into result array
+        foreach($static_data as $parking) {
+            $label = '';
+            $description = '';
+            $numOfSpaces = '';
+            foreach($parking as $triple) {
+                if ($triple['predicate'] === 'http://www.w3.org/2000/01/rdf-schema#label') {
+                    $label = $triple['object'];
+                } else if ($triple['predicate'] === 'http://purl.org/dc/terms/description') {
+                    $description = $triple['object'];
+                } else if ($triple['predicate'] === 'http://vocab.datex.org/terms#parkingNumberOfSpaces') {
+                    $numOfSpaces = $triple['object'];
+                }
+            }
+            $parkingSite = array(
+                'parkingName' => array('values' => array('value' => array(
+                    '@attributes' => array('lang' => 'nl'),
+                    '@value' => $label
+                ))),
+                'parkingNumberOfSpaces' => $numOfSpaces
+                // TODO parkingLocation, parkingSiteAddress, openingTimes are not available
+            );
+            if ($description !== '') {
+                $parkingSite['parkingSite']['parkingDescription'] = array('values' => array('value' => array(
+                    '@attributes' => array('lang' => 'nl'),
+                    '@value' => $description
+                )));
+            }
+            array_push($this->array['payloadPublication']['genericPublicationExtension']
+                                   ['parkingTablePublication']['parkingTable']['parkingRecord']['parkingSite'], $parkingSite);
         }
     }
 
