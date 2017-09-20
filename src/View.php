@@ -21,7 +21,7 @@ Class View
     private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
-        $priorities = array('text/turtle','application/xml');
+        $priorities = array('application/trig','application/xml');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
         $value = $mediaType->getValue();
         header("Content-type: $value");
@@ -54,7 +54,7 @@ Class View
         Helpers\Metadata::addMeasurementMetadata($graph);
         Helpers\Metadata::addCountsToGraph($graph, $base_url);
 
-        if ($value === 'text/turtle') {
+        if ($value === 'application/trig') {
             $writer = new TriGWriter(["format" => $value]);
             $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
             $writer->addTriples($graph["triples"]);
