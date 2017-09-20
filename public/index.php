@@ -65,7 +65,7 @@ function dataset($graph_processor) {
         // This data is being gathered here, get the file
         // If no preferred content type is specified, prefer turtle
         if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
-            $_SERVER['HTTP_ACCEPT'] = 'text/turtle';
+            $_SERVER['HTTP_ACCEPT'] = 'application/trig';
         }
 
         $filename = null;
