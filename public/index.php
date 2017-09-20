@@ -6,6 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
+use oSoc\Smartflanders\Helpers\RangeGateIntervalCalculator;
 use Tracy\Debugger;
 use Dotenv\Dotenv;
 
@@ -148,7 +149,7 @@ $router->get('/parking', function(){
 });
 
 $router->get('/parking/rangegate', function() {
-    echo "This is the root range gate";
+    $calc = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG']);
 });
 
 $router->get('/parking/rangegate/([^/]+)', function($gatename) {
