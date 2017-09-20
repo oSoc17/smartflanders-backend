@@ -147,4 +147,12 @@ $router->get('/parking', function(){
     }
 });
 
+$router->get('/parking/rangegate', function() {
+    echo "This is the root range gate";
+});
+
+$router->get('/parking/rangegate/([^/]+)', function($gatename) {
+    echo "This is a sub range gate: " . $gatename;
+});
+
 $router->run();
