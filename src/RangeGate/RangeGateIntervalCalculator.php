@@ -1,6 +1,6 @@
 <?php
 
-namespace oSoc\Smartflanders\Helpers;
+namespace oSoc\Smartflanders\RangeGate;
 
 
 class RangeGateIntervalCalculator
@@ -19,7 +19,6 @@ class RangeGateIntervalCalculator
         $day = 60*60*24;
         $rest = $oldest_timestamp % $day;
         $this->oldest = $oldest_timestamp + $day - $rest - 2*60*60;
-        echo $oldest_timestamp . " " . $this->oldest . "<br>";
 
         // Parse the configuration string
         $exploded = explode(',', $configString);

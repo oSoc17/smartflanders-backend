@@ -4,7 +4,7 @@ namespace oSoc\Smartflanders;
 
 use Bramus;
 use Dotenv\Dotenv;
-use oSoc\Smartflanders\Helpers\RangeGateIntervalCalculator;
+use oSoc\Smartflanders\RangeGate;
 
 class Router
 {
@@ -45,7 +45,7 @@ class Router
                 $found = true;
                 $dataset = $this->nameToGP[$dataset_name];
                 $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $dataset);
-                $calc = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG'], $fs->getOldestTimestamp());
+                //$calc = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG'], $fs->getOldestTimestamp());
             }
         }
 
@@ -61,17 +61,10 @@ class Router
         );
 
         $this->router->get('/parking/rangegate',
-            function() use ($found, $dataset, $fs, $calc) {
-                echo "This is root range gate.<br>";
+            function() use ($found, $dataset, $fs) {
                 if ($found) {
-                    echo "Dataset: " . $dataset->getName() . "<br>";
-                    $subgates = $calc->getRootSubRangeGates();
-                    echo "subgates: <br>";
-                    foreach ($subgates as $gate) {
-                        $start = date('Y-m-d\TH:i:s',$gate[0]);
-                        $end = date('Y-m-d\TH:i:s',$gate[1]);
-                        echo $start . "_" . $end . "<br>";
-                    }
+                    $writer = new RangeGate\RangeGateWriter(RangeGate\RangeGateWriter::$ROOT_GATE, $dataset, $fs);
+                    $writer->serialize();
                 } else {
                     echo "Dataset not found.<br>";
                 }
@@ -79,27 +72,10 @@ class Router
         );
 
         $this->router->get('/parking/rangegate/([^/]+)',
-            function($gatename) use ($found, $dataset, $calc){
-                //global $found; global $dataset; global $calc;
-                echo "Sub range gate " . $gatename . ".<br>";
+            function($gatename) use ($found, $dataset, $fs){
                 if ($found) {
-                    echo "Dataset: " . $dataset->getName() . ".<br>";
-                    if ($calc->isLegal($gatename)) {
-                        echo "Range gate name is legal.<br>";
-                        $subgates = $calc->getSubRangeGates($gatename);
-                        if ($subgates) {
-                            echo "subgates: <br>";
-                            foreach ($subgates as $gate) {
-                                $start = date('Y-m-d\TH:i:s', $gate[0]);
-                                $end = date('Y-m-d\TH:i:s',$gate[1]);
-                                echo $start . "_" . $end . "<br>";
-                            }
-                        } else {
-                            echo "Sublevel is leaf level.<br>";
-                        }
-                    } else {
-                        echo "Illegal range gate name.<br>";
-                    }
+                    $writer = new RangeGate\RangeGateWriter($gatename, $dataset, $fs);
+                    $writer->serialize();
                 } else {
                     echo "Dataset not found.<br>";
                 }
