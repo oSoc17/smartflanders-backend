@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: arnegevaert
- * Date: 20/09/17
- * Time: 16:43
- */
 
 namespace oSoc\Smartflanders\Helpers;
 
@@ -21,7 +15,11 @@ class RangeGateIntervalCalculator
     );
 
     public function __construct($configString, $oldest_timestamp) {
-        $this->oldest = $oldest_timestamp;
+        // Round the oldest timestamp up to 1 day
+        $day = 60*60*24;
+        $rest = $oldest_timestamp % $day;
+        $this->oldest = $oldest_timestamp + $day - $rest - 2*60*60;
+        echo $oldest_timestamp . " " . $this->oldest . "<br>";
 
         // Parse the configuration string
         $exploded = explode(',', $configString);
@@ -65,8 +63,8 @@ class RangeGateIntervalCalculator
         return $this->calculateSubRangeGates($level_index, $interval[0]);
     }
 
-    public function getRootSubRangeGates($start) {
-        return $this->calculateSubRangeGates(-1, $start);
+    public function getRootSubRangeGates() {
+        return $this->calculateSubRangeGates(-1, $this->oldest);
     }
 
     private function calculateSubRangeGates($level_index, $lower_bound) {

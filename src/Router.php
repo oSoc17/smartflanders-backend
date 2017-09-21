@@ -65,7 +65,7 @@ class Router
                 echo "This is root range gate.<br>";
                 if ($found) {
                     echo "Dataset: " . $dataset->getName() . "<br>";
-                    $subgates = $calc->getRootSubRangeGates($fs->getOldestTimestamp());
+                    $subgates = $calc->getRootSubRangeGates();
                     echo "subgates: <br>";
                     foreach ($subgates as $gate) {
                         $start = date('Y-m-d\TH:i:s',$gate[0]);

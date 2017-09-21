@@ -13,11 +13,6 @@ use oSoc\Smartflanders\Helpers;
 
 Class View
 {
-    /**
-     * @param $acceptHeader
-     * @param $historic
-     * @return mixed
-     */
     private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
@@ -40,11 +35,6 @@ Class View
         return $value;
     }
 
-    /**
-     * @param $acceptHeader
-     * @param $graph
-     * @param $historic
-     */
     public static function view($graph_processor, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
         if (in_array($graph_processor, $processors_gather)) {
             // This data is being gathered here, get the file
