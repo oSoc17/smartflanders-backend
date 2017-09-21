@@ -45,7 +45,6 @@ class Router
                 $found = true;
                 $dataset = $this->nameToGP[$dataset_name];
                 $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $dataset);
-                //$calc = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG'], $fs->getOldestTimestamp());
             }
         }
 
@@ -60,11 +59,17 @@ class Router
             }
         );
 
+
+        // TODO These headers shouldn't be hardcoded
         $this->router->get('/parking/rangegate',
             function() use ($found, $dataset, $fs) {
                 if ($found) {
                     $writer = new RangeGate\RangeGateWriter(RangeGate\RangeGateWriter::$ROOT_GATE, $dataset, $fs);
-                    $writer->serialize();
+                    header("Content-type: text/turtle");
+                    header("Cache-Control: max-age=31536000");
+                    header("Access-Control-Allow-Origin: *");
+                    header("Vary: Accept");
+                    echo $writer->serialize();
                 } else {
                     echo "Dataset not found.<br>";
                 }
@@ -75,7 +80,11 @@ class Router
             function($gatename) use ($found, $dataset, $fs){
                 if ($found) {
                     $writer = new RangeGate\RangeGateWriter($gatename, $dataset, $fs);
-                    $writer->serialize();
+                    header("Content-type: text/turtle");
+                    header("Cache-Control: max-age=31536000");
+                    header("Access-Control-Allow-Origin: *");
+                    header("Vary: Accept");
+                    echo $writer->serialize();
                 } else {
                     echo "Dataset not found.<br>";
                 }
