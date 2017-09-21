@@ -35,35 +35,49 @@ class RangeGateIntervalCalculator
     }
 
     public function isLegal($intervalString) {
-        // TODO determine if this interval string is legal, following the configuration in $levels
         // Interval string is of form YYYY-MM-DDThh:mm:ss_YYYY-MM-DDThh:mm:ss
-        try {
-            $exploded = explode('_', $intervalString);
-            $start = $exploded[0];
-            $end = $exploded[1];
-            $start_ts = strtotime($start);
-            $end_ts = strtotime($end);
-            $diff = $end_ts - $start_ts;
+        $interval = $this->parseIntervalString($intervalString);
+        $diff = $interval[1] - $interval[0];
 
-            if ($diff === 0) {
-                return false;
-            }
-
-            // Determine if difference between start and end is valid
-            if (!in_array($diff, $this->levels)) {
-                echo "Invalid difference. ";
-                return false;
-            }
-
-            // Determine if start is valid (must be a multiple of diff greater than oldest_timestamp)
-            $start_relative = $start_ts - $this->oldest;
-            if ($start_relative % $diff !== 0) {
-                echo "Invalid starting point. ";
-                return false;
-            }
-            return true;
-        } catch (Exception $e) {
+        if ($diff === 0) {
             return false;
         }
+
+        // Determine if difference between start and end is valid
+        if (!in_array($diff, $this->levels)) {
+            echo "Invalid difference.<br>";
+            return false;
+        }
+
+        // Determine if start is valid (must be a multiple of diff greater than oldest_timestamp)
+        $start_relative = $interval[0] - $this->oldest;
+        if ($start_relative % $diff !== 0) {
+            echo "Invalid starting point.<br>";
+            return false;
+        }
+        return true;
+    }
+
+    // Returns an array of sub range gates or false if next level is leaf level
+    public function getSubRangeGates($intervalString) {
+        $interval = $this->parseIntervalString($intervalString);
+        $level_index = array_search($interval[1] - $interval[0], $this->levels);
+        if ($level_index < count($this->levels)-1) {
+            $sub_level = $this->levels[$level_index + 1];
+            echo "Sublevel: " . $sub_level . "<br>";
+        } else {
+            echo "Sublevel is leaf level.<br>";
+        }
+    }
+
+    public function getFirstLevel() {
+        return $this->levels[0];
+    }
+
+    private function parseIntervalString($string) {
+        $exploded = explode('_', $string);
+        $start = $exploded[0];
+        $end = $exploded[1];
+        return array(strtotime($start), strtotime($end));
     }
 }

@@ -157,28 +157,30 @@ $router->get('/parking', function(){
 });
 
 $router->get('/parking/rangegate', function() {
-    global $found; global $dataset;
-    echo "This is root range gate. ";
+    global $found; global $dataset; global $calc;
+    echo "This is root range gate.<br>";
     if ($found) {
-        echo "Dataset: " . $dataset->getName();
+        echo "Dataset: " . $dataset->getName() . "<br>";
+        echo "Sublevel: " . $calc->getFirstLevel() . "<br>";
     } else {
-        echo "Dataset not found.";
+        echo "Dataset not found.<br>";
     }
 
 });
 
 $router->get('/parking/rangegate/([^/]+)', function($gatename) {
     global $found; global $dataset; global $calc;
-    echo "Sub range gate " . $gatename . ". ";
+    echo "Sub range gate " . $gatename . ".<br>";
     if ($found) {
-        echo "Dataset: " . $dataset->getName() . ". ";
+        echo "Dataset: " . $dataset->getName() . ".<br>";
         if ($calc->isLegal($gatename)) {
-            echo "Range gate name is legal.";
+            echo "Range gate name is legal.<br>";
+            $calc->getSubRangeGates($gatename);
         } else {
-            echo "Illegal range gate name.";
+            echo "Illegal range gate name.<br>";
         }
     } else {
-        echo "Dataset not found.";
+        echo "Dataset not found.<br>";
     }
 });
 
