@@ -7,7 +7,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use oSoc\Smartflanders\Datasets;
 use Bramus\Router;
 use oSoc\Smartflanders\Helpers\RangeGateIntervalCalculator;
-use Tracy\Debugger;
 use Dotenv\Dotenv;
 
 $dotenv = new Dotenv(__DIR__ . '/../');
@@ -49,85 +48,6 @@ $out_dirname = __DIR__ . "/../out";
 $res_dirname = __DIR__ . "/../resources";
 $second_interval = 300;
 
-//Tracy debugger
-//Debugger::enable();
-
-// TODO parameters need to be passed, they are now hardcoded in THIS class only .... (Router)
-
-/**
- * For one dataset, the content of this function can be pasted in index.php
- * Just replace $graph_processor with the actual (only) graph processor class for the dataset.
- * @param $graph_processor
- */
-function dataset($graph_processor) {
-    global $out_dirname; global $res_dirname; global $second_interval;
-
-    global $processors_gather;
-
-    if (in_array($graph_processor, $processors_gather)) {
-        // This data is being gathered here, get the file
-        // If no preferred content type is specified, prefer turtle
-        if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
-            $_SERVER['HTTP_ACCEPT'] = 'application/trig';
-        }
-
-        $filename = null;
-
-        $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
-
-        if (!isset($_GET['page']) && !isset($_GET['time'])) {
-            $timestamp = $fs->getLastPage();
-	        $filename = date("Y-m-d\TH:i:s", $timestamp);
-        }
-
-        else if (isset($_GET['page'])) {
-            // If page name is provided, it must be exact
-            $filename = strtotime($_GET['page']);
-            if (!$fs->hasFile($filename)) {
-                http_response_code(404);
-                die("Page not found");
-            }
-        }
-
-        else if (isset($_GET['time'])) {
-            // If timestamp is provided, find latest file before timestamp
-            $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
-            $filename = date("Y-m-d\TH:i:s", $timestamp);
-            if (!$filename) {
-                http_response_code(404);
-                die("Time not found");
-            }
-        }
-
-        if (!isset($_GET['page'])) {
-            header("Access-Control-Allow-Origin: *");
-            header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $filename);
-        } else {
-            // This is sloppy coding
-            $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
-            $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
-            $historic = true;
-            if ((string)$filename === $fs->getLastPage()) {
-                $historic = false;
-            }
-            View::view($_SERVER['HTTP_ACCEPT'], $graphs, $historic, $graph_processor->getBaseUrl(), $graph_processor->getRealTimeMaxAge());
-        }
-    } else {
-        // This data is not being gathered here, the base URL redirects to somewhere else
-        // Just copy arguments and redirect
-        if (isset($_GET['page'])) {
-            header("Access-Control-Allow-Origin: *");
-            header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $_GET['page']);
-        } else if (isset($_GET['time'])) {
-            header("Access-Control-Allow-Origin: *");
-            header('Location: ' . $graph_processor->getBaseUrl() . '?time=' . $_GET['time']);
-        } else {
-            header("Access-Control-Allow-Origin: *");
-            header('Location: ' . $graph_processor->getBaseUrl());
-        }
-    }
-}
-
 // Reverse proxy: this code routes between different datasets
 // This is only necessary because multiple datasets are being hosted on the same domain.
 $router = new Router\Router();
@@ -147,9 +67,10 @@ foreach($nameToGP as $name => $gp) {
 }
 
 $router->get('/parking', function(){
-    global $found; global $dataset;
+    global $found, $dataset, $out_dirname, $res_dirname, $second_interval, $processors_gather;
     if ($found) {
-        dataset($dataset);
+        //dataset($dataset);
+        View::view($dataset, $out_dirname, $res_dirname, $second_interval, $processors_gather);
     } else {
         http_response_code(404);
         die("Route not found: " . $dataset);
