@@ -62,16 +62,36 @@ class RangeGateIntervalCalculator
     public function getSubRangeGates($intervalString) {
         $interval = $this->parseIntervalString($intervalString);
         $level_index = array_search($interval[1] - $interval[0], $this->levels);
-        if ($level_index < count($this->levels)-1) {
-            $sub_level = $this->levels[$level_index + 1];
-            echo "Sublevel: " . $sub_level . "<br>";
-        } else {
-            echo "Sublevel is leaf level.<br>";
-        }
+        return $this->calculateSubRangeGates($level_index, $interval[0]);
     }
 
-    public function getFirstLevel() {
-        return $this->levels[0];
+    public function getRootSubRangeGates($start) {
+        return $this->calculateSubRangeGates(-1, $start);
+    }
+
+    private function calculateSubRangeGates($level_index, $lower_bound) {
+        $result = array();
+        if ($level_index < count($this->levels)-1) {
+            $sub_level = $this->levels[$level_index + 1];
+            $start = $lower_bound; $end = $start + $sub_level;
+            array_push($result, array($start, $end));
+            if ($level_index > -1) {
+                while ($end <= $lower_bound + $this->levels[$level_index] && $end <= time()) {
+                    $start = $end;
+                    $end = $end + $sub_level;
+                    array_push($result, array($start, $end));
+                }
+            } else {
+                while ($end <= time()) {
+                    $start = $end;
+                    $end = $end + $sub_level;
+                    array_push($result, array($start, $end));
+                }
+            }
+        } else {
+            return false;
+        }
+        return $result;
     }
 
     private function parseIntervalString($string) {

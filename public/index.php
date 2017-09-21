@@ -157,11 +157,17 @@ $router->get('/parking', function(){
 });
 
 $router->get('/parking/rangegate', function() {
-    global $found; global $dataset; global $calc;
+    global $found; global $dataset; global $calc; global $fs;
     echo "This is root range gate.<br>";
     if ($found) {
         echo "Dataset: " . $dataset->getName() . "<br>";
-        echo "Sublevel: " . $calc->getFirstLevel() . "<br>";
+        $subgates = $calc->getRootSubRangeGates($fs->getOldestTimestamp());
+        echo "subgates: <br>";
+        foreach ($subgates as $gate) {
+            $start = date('Y-m-d\TH:i:s',$gate[0]);
+            $end = date('Y-m-d\TH:i:s',$gate[1]);
+            echo $start . "_" . $end . "<br>";
+        }
     } else {
         echo "Dataset not found.<br>";
     }
@@ -175,7 +181,17 @@ $router->get('/parking/rangegate/([^/]+)', function($gatename) {
         echo "Dataset: " . $dataset->getName() . ".<br>";
         if ($calc->isLegal($gatename)) {
             echo "Range gate name is legal.<br>";
-            $calc->getSubRangeGates($gatename);
+            $subgates = $calc->getSubRangeGates($gatename);
+            if ($subgates) {
+                echo "subgates: <br>";
+                foreach ($subgates as $gate) {
+                    $start = date('Y-m-d\TH:i:s', $gate[0]);
+                    $end = date('Y-m-d\TH:i:s',$gate[1]);
+                    echo $start . "_" . $end . "<br>";
+                }
+            } else {
+                echo "Sublevel is leaf level.<br>";
+            }
         } else {
             echo "Illegal range gate name.<br>";
         }
