@@ -16,14 +16,6 @@ Class FileSystemProcessor {
     protected $static_data_filename;
     const REFRESH_STATIC = false;
 
-    /**
-     * @param mixed $out_dirname
-     * @param $res_dirname
-     * @param int $second_interval
-     * FileSystem constructor.
-     * @param Helpers\IGraphProcessor $graph_processor
-     * @internal param $mixed @res_dirname
-     */
     public function __construct($out_dirname, $res_dirname, $second_interval, $graph_processor)
     {
         $this->second_interval = $second_interval;
@@ -35,9 +27,6 @@ Class FileSystemProcessor {
         $this->graph_processor = $graph_processor;
         $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
         if(!$this->res_fs->has($this->static_data_filename) || self::REFRESH_STATIC){
-            /*if (self::REFRESH_STATIC) {
-                $this->res_fs->delete($this->static_data_filename);
-            }*/
             $graph = $graph_processor->getStaticGraph();
             $this->writer = new TriGWriter();
             $this->writer->addPrefixes($graph["prefixes"]);
@@ -46,56 +35,30 @@ Class FileSystemProcessor {
         }
     }
 
-    /**
-     * @return mixed
-     */
+    public function getFilesBetween($start, $end) {
+        $result = array();
+        $start = $this->getPreviousTimestampFromTimestamp($start);
+        for ($i = $start; $i < $end; $i += $this->second_interval) {
+            if ($this->hasFile($i)) {
+                array_push($result, $i);
+            }
+        }
+        return $result;
+    }
 
     public function getSecondInterval()
     {
         return $this->second_interval;
     }
 
-    /**
-     * @param mixed $second_interval
-     */
-
     public function setSecondInterval($second_interval)
     {
         $this->second_interval = $second_interval;
     }
 
-    /**
-     * @param $timestamp
-     * @return bool|string
-     * This function receives a timestamp and look for the page where the data
-     * for this timestamp can be found
-     */
-
-    public function getClosestPage($timestamp) {
-        $return_ts = $timestamp;
-        if (!$this->hasFile($this->roundTimestamp($timestamp))) {
-            // Exact file doesn't exist, get closest
-            $prev = $this->getPreviousTimestampFromTimestamp($timestamp);
-            $next = $this->getNextTimestampForTimestamp($timestamp);
-            if ($prev && $next) {
-                // prev and next exist, get closest
-                $p_diff = $timestamp - $prev;
-                $n_diff = $next - $timestamp;
-                $return_ts = $n_diff < $p_diff ? $next : $prev;
-            } else {
-                // One or none of both exist. Return the one that exists, or false if none exist
-                $return_ts = $prev ? $prev : $next;
-            }
-        }
-        if ($return_ts) {
-            return (string)$this->roundTimestamp($return_ts);
-        }
-        return false;
-    }
-
     // Get the last written page (closest to now)
     public function getLastPage() {
-        return $this->getClosestPage(time());
+        return $this->getPreviousTimestampFromTimestamp(time());
     }
 
     // Get the oldest timestamp for which a file exists
@@ -107,15 +70,13 @@ Class FileSystemProcessor {
         return false;
     }
 
-    // PRIVATE METHODS
-
     // Round a timestamp to its respective file timestamp
     protected function roundTimestamp($timestamp) {
         $timestamp -= $timestamp % $this->second_interval;
         return $timestamp;
     }
 
-    protected function getPreviousTimestampFromTimestamp($timestamp) {
+    public function getPreviousTimestampFromTimestamp($timestamp) {
         $oldest = $this->getOldestTimestamp();
         if ($oldest) {
             $timestamp = $this->roundTimestamp($timestamp);
@@ -130,7 +91,7 @@ Class FileSystemProcessor {
         return false;
     }
 
-    protected function getNextTimestampForTimestamp($timestamp) {
+    public function getNextTimestampForTimestamp($timestamp) {
         $timestamp = $this->roundTimestamp($timestamp);
         $now = time();
         while($timestamp < $now) {

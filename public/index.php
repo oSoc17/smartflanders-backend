@@ -24,7 +24,7 @@ foreach($processors as $gp) {
 
 $out_dirname = __DIR__ . "/../out";
 $res_dirname = __DIR__ . "/../resources";
-$second_interval = 300;
+$second_interval = 60*60*3; // TODO store this in .env!
 
 $router = new Router($_SERVER['HTTP_HOST'], $out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather);
 $router->init();

@@ -63,7 +63,7 @@ Class View
 
             else if (isset($_GET['time'])) {
                 // If timestamp is provided, find latest file before timestamp
-                $timestamp = $fs->getClosestPage(strtotime($_GET['time']));
+                $timestamp = $fs->getPreviousTimestampFromTimestamp(strtotime($_GET['time']));
                 $filename = date("Y-m-d\TH:i:s", $timestamp);
                 if (!$filename) {
                     http_response_code(404);

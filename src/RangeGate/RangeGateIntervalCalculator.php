@@ -42,14 +42,12 @@ class RangeGateIntervalCalculator
 
         // Determine if difference between start and end is valid
         if (!in_array($diff, $this->levels)) {
-            echo "Invalid difference.<br>";
             return false;
         }
 
         // Determine if start is valid (must be a multiple of diff greater than oldest_timestamp)
         $start_relative = $interval[0] - $this->oldest;
         if ($start_relative % $diff !== 0) {
-            echo "Invalid starting point.<br>";
             return false;
         }
         return true;
@@ -91,7 +89,7 @@ class RangeGateIntervalCalculator
         return $result;
     }
 
-    private function parseIntervalString($string) {
+    public function parseIntervalString($string) {
         $exploded = explode('_', $string);
         $start = $exploded[0];
         $end = $exploded[1];
