@@ -98,8 +98,14 @@ Class FileSystemProcessor {
         return $this->getClosestPage(time());
     }
 
-    // Write a measurement to a page
-
+    // Get the oldest timestamp for which a file exists
+    public function getOldestTimestamp() {
+        $filename = $this->graph_processor->getName() . "_oldest_timestamp";
+        if ($this->res_fs->has($filename)) {
+            return $this->res_fs->read($filename);
+        }
+        return false;
+    }
 
     // PRIVATE METHODS
 
@@ -107,15 +113,6 @@ Class FileSystemProcessor {
     protected function roundTimestamp($timestamp) {
         $timestamp -= $timestamp % $this->second_interval;
         return $timestamp;
-    }
-
-    // Get the oldest timestamp for which a file exists
-    protected function getOldestTimestamp() {
-        $filename = $this->graph_processor->getName() . "_oldest_timestamp";
-        if ($this->res_fs->has($filename)) {
-            return $this->res_fs->read($filename);
-        }
-        return false;
     }
 
     protected function getPreviousTimestampFromTimestamp($timestamp) {
