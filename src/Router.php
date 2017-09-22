@@ -64,12 +64,8 @@ class Router
         $this->router->get('/parking/rangegate',
             function() use ($found, $dataset, $fs) {
                 if ($found) {
-                    $writer = new RangeGate\RangeGateWriter(RangeGate\RangeGateWriter::$ROOT_GATE, $dataset, $fs);
-                    header("Content-type: text/turtle");
-                    header("Cache-Control: max-age=31536000");
-                    header("Access-Control-Allow-Origin: *");
-                    header("Vary: Accept");
-                    echo $writer->serialize();
+                    $rangegate = new RangeGate\RangeGate(RangeGate\RangeGate::$ROOT_GATE, $dataset, $fs);
+                    View::viewRangeGate($rangegate);
                 } else {
                     echo "Dataset not found.<br>";
                 }
@@ -79,12 +75,8 @@ class Router
         $this->router->get('/parking/rangegate/([^/]+)',
             function($gatename) use ($found, $dataset, $fs){
                 if ($found) {
-                    $writer = new RangeGate\RangeGateWriter($gatename, $dataset, $fs);
-                    header("Content-type: text/turtle");
-                    header("Cache-Control: max-age=31536000");
-                    header("Access-Control-Allow-Origin: *");
-                    header("Vary: Accept");
-                    echo $writer->serialize();
+                    $rangegate = new RangeGate\RangeGate($gatename, $dataset, $fs);
+                    View::viewRangeGate($rangegate);
                 } else {
                     echo "Dataset not found.<br>";
                 }

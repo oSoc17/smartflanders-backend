@@ -35,6 +35,19 @@ Class View
         return $value;
     }
 
+    public static function viewRangeGate($rangegate) {
+        // TODO content negotiation, cache headers
+        header("Content-type: text/turtle");
+        header("Cache-Control: max-age=31536000");
+        header("Access-Control-Allow-Origin: *");
+        header("Vary: Accept");
+        $graph = $rangegate->getGraph();
+        $writer = new TriGWriter(["format" => "text/turtle"]);
+        $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+        $writer->addTriples($graph["triples"]);
+        echo $writer->end();
+    }
+
     public static function view($graph_processor, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
         if (in_array($graph_processor, $processors_gather)) {
             // This data is being gathered here, get the file

@@ -6,7 +6,7 @@ use Dotenv\Dotenv;
 use pietercolpaert\hardf;
 use oSoc\Smartflanders\Helpers\TripleHelper;
 
-class RangeGateWriter
+class RangeGate
 {
     private $gatename;
     private $dataset;
@@ -30,12 +30,9 @@ class RangeGateWriter
         $this->interval = $this->intervalCalculator->parseIntervalString($this->gatename);
     }
 
-    public function serialize() {
+    public function getGraph() {
         $graph = array('triples' => array());
         $subgates = $this->getSubGates();
-
-        $trigWriter = new hardf\TriGWriter();
-        $trigWriter->addPrefix('mdi', 'http://semweb.datasciencelab.be/ns/multidimensional-interface/');
 
         if ($subgates) {
             foreach($subgates as $gate) {
@@ -58,14 +55,12 @@ class RangeGateWriter
             }
         }
 
-
-        $trigWriter->addTriples($graph['triples']);
-        return $trigWriter->end();
+        return $graph;
     }
 
     private function getSubGates() {
         $subgates = null;
-        if ($this->gatename === RangeGateWriter::$ROOT_GATE) {
+        if ($this->gatename === RangeGate::$ROOT_GATE) {
             $subgates = $this->intervalCalculator->getRootSubRangeGates();
         } else {
             if ($this->intervalCalculator->isLegal($this->gatename)) {
