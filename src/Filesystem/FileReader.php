@@ -2,6 +2,8 @@
 namespace oSoc\Smartflanders\Filesystem;
 
 use pietercolpaert\hardf\TriGParser;
+use pietercolpaert\hardf\Util;
+use oSoc\Smartflanders\Helpers;
 
 class FileReader extends FileSystemProcessor {
 
@@ -48,17 +50,65 @@ class FileReader extends FileSystemProcessor {
     public function getStatisticalSummary($interval) {
         $result = array();
 
+        $buildingBlocks = array(
+            'mean' => 'http://datapiloten.be/vocab/timeseries#mean',
+            'median' => 'http://datapiloten.be/vocab/timeseries#hasMedian',
+            'variance' => 'http://datapiloten.be/vocab/timeseries#variance',
+            'firstQuartile' => 'http://datapiloten.be/vocab/timeseries#firstQuartile',
+            'thirdQuartile' => 'http://datapiloten.be/vocab/timeseries#thirdQuartile'
+        );
+
+        $sortedStatistics = array(
+            $buildingBlocks['mean'] => array(),
+            $buildingBlocks['median'] => array(),
+            $buildingBlocks['variance'] => array(),
+            $buildingBlocks['firstQuartile'] => array(),
+            $buildingBlocks['thirdQuartile'] => array()
+        );
+
         $unix = $interval[0];
+        $statistics = array();
         while ($unix < $interval[1]) {
             $filename = date('Y-m-d', $unix);
             if ($this->stat_fs->has($filename)) {
                 $contents = $this->stat_fs->read($filename);
                 $parser = new TriGParser(["format" => "trig"]);
                 $triples = $parser->parse($contents);
-                // TODO instead of merging, new values for mean, median, ... should be calculated
-                $result = array_merge($result, $triples);
+                $statistics = array_merge($statistics, $triples);
             }
             $unix += 60*60*24;
+        }
+
+        foreach ($statistics as $triple) {
+            if (!array_key_exists($triple['subject'], $sortedStatistics[$triple['predicate']])) {
+                $sortedStatistics[$triple['predicate']][$triple['subject']] = array();
+            }
+            $value = intval(Util::getLiteralValue($triple["object"]));
+            array_push($sortedStatistics[$triple["predicate"]][$triple['subject']], $value);
+        }
+
+        // Take median of medians, means of the rest
+        $medians = $sortedStatistics[$buildingBlocks['median']];
+        foreach ($medians as $parking => $values) {
+            sort($values);
+            $median = $values[intdiv(count($values), 2)];
+            array_push($result, array(
+                'subject' => $parking,
+                'predicate' => $buildingBlocks['median'],
+                'object' => '"' . $median . '"'
+            ));
+        }
+
+        foreach(array('mean', 'variance', 'thirdQuartile', 'firstQuartile') as $param) {
+            foreach($sortedStatistics[$buildingBlocks[$param]] as $parking => $values) {
+                $sum = array_sum($values);
+                $mean = $sum / count($values);
+                array_push($result, array(
+                    'subject' => $parking,
+                    'predicate' => $buildingBlocks[$param],
+                    'object' => '"' . $mean . '"'
+                ));
+            }
         }
 
         return $result;
