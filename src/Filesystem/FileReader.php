@@ -48,14 +48,17 @@ class FileReader extends FileSystemProcessor {
     public function getStatisticalSummary($interval) {
         $result = array();
 
-        $startDay = date('Y-m-d', $interval[0]);
-        $endDay = date('Y-m-d', $interval[1]);
-        $filename = $startDay . '_' . $endDay;
-
-        if ($this->stat_fs->has($filename)) {
-            $contents = $this->stat_fs->read($filename);
-            $parser = new TriGParser(["format" => "trig"]);
-            $result = $parser->parse($contents);
+        $unix = $interval[0];
+        while ($unix < $interval[1]) {
+            $filename = date('Y-m-d', $unix);
+            if ($this->stat_fs->has($filename)) {
+                $contents = $this->stat_fs->read($filename);
+                $parser = new TriGParser(["format" => "trig"]);
+                $triples = $parser->parse($contents);
+                // TODO instead of merging, new values for mean, median, ... should be calculated
+                $result = array_merge($result, $triples);
+            }
+            $unix += 60*60*24;
         }
 
         return $result;
