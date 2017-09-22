@@ -5,25 +5,32 @@ namespace oSoc\Smartflanders\Filesystem;
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
 use pietercolpaert\hardf\TriGWriter;
-use \oSoc\Smartflanders\Helpers;
+
 
 Class FileSystemProcessor {
     protected $out_fs;
     protected $res_fs;
+    protected $stat_fs;
     protected $second_interval;
     protected $writer;
     protected $graph_processor;
     protected $static_data_filename;
+    protected $out_dirname;
+    protected $res_dirname;
     const REFRESH_STATIC = false;
 
     public function __construct($out_dirname, $res_dirname, $second_interval, $graph_processor)
     {
+        $this->out_dirname = $out_dirname;
+        $this->res_dirname = $res_dirname;
         $this->second_interval = $second_interval;
         date_default_timezone_set("Europe/Brussels");
         $out_adapter = new Local($out_dirname . "/" . $graph_processor->getName());
         $this->out_fs = new Filesystem($out_adapter);
         $res_adapter = new Local($res_dirname);
         $this->res_fs = new Filesystem($res_adapter);
+        $stat_adapter = new Local($out_dirname . "/" . $graph_processor->getName() . "/statistical");
+        $this->stat_fs = new Filesystem($stat_adapter);
         $this->graph_processor = $graph_processor;
         $this->static_data_filename = $graph_processor->getName() . "_static_data.turtle";
         if(!$this->res_fs->has($this->static_data_filename) || self::REFRESH_STATIC){
@@ -106,5 +113,13 @@ Class FileSystemProcessor {
 
     public function hasFile($filename) {
         return $this->out_fs->has($filename);
+    }
+
+    public function getFileReader() {
+        return new FileReader($this->out_dirname, $this->res_dirname, $this->second_interval, $this->graph_processor);
+    }
+
+    public function getFileWriter() {
+        return new FileWriter($this->out_dirname, $this->res_dirname, $this->second_interval, $this->graph_processor);
     }
 }

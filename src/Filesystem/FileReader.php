@@ -7,9 +7,8 @@ class FileReader extends FileSystemProcessor {
 
 
     public function getFullyDressedGraphsFromFile($filename) {
-        $static_parser = new TriGParser(["format" => "trig"]);
         $dynamic_parser = new TriGParser(["format" => "trig"]);
-        $static_data = $static_parser->parse($this->getStaticData());
+        $static_data = $this->getStaticData();
         $triples = $dynamic_parser->parse($this->getFileContents($filename));
         $multigraph = [
             "triples" => $triples
@@ -46,6 +45,27 @@ class FileReader extends FileSystemProcessor {
         return $multigraph;
     }
 
+    public function getStatisticalSummary($interval) {
+        $result = array();
+
+        $startDay = date('Y-m-d', $interval[0]);
+        $endDay = date('Y-m-d', $interval[1]);
+        $filename = $startDay . '_' . $endDay;
+
+        if ($this->stat_fs->has($filename)) {
+            $contents = $this->stat_fs->read($filename);
+            $parser = new TriGParser(["format" => "trig"]);
+            $result = $parser->parse($contents);
+        }
+
+        return $result;
+    }
+
+    public function getStaticData() {
+        $static_parser = new TriGParser(["format" => "trig"]);
+        return $static_parser->parse($this->res_fs->read($this->static_data_filename));
+    }
+
     // Get the contents of a file
     private function getFileContents($filename) {
         if ($this->hasFile($filename)) {
@@ -70,9 +90,5 @@ class FileReader extends FileSystemProcessor {
             return date("Y-m-d\TH:i:s", $prev_ts);
         }
         return false;
-    }
-
-    private function getStaticData() {
-        return $this->res_fs->read($this->static_data_filename);
     }
 }

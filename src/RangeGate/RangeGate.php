@@ -3,7 +3,6 @@
 namespace oSoc\Smartflanders\RangeGate;
 
 use Dotenv\Dotenv;
-use pietercolpaert\hardf;
 use oSoc\Smartflanders\Helpers\TripleHelper;
 
 class RangeGate
@@ -31,8 +30,31 @@ class RangeGate
     }
 
     public function getGraph() {
+        $graph = $this->getSubGates();
+        $reader = $this->fs->getFileReader();
+        $staticData = $reader->getStaticData();
+        $summary = $reader->getStatisticalSummary($this->interval);
+
+        $graph["triples"] = array_merge($graph["triples"], $staticData);
+        $graph["triples"] = array_merge($graph["triples"], $summary);
+
+        return $graph;
+    }
+
+    private function getSubGates() {
         $graph = array('triples' => array());
-        $subgates = $this->getSubGates();
+
+        $subgates = null;
+        if ($this->gatename === RangeGate::$ROOT_GATE) {
+            $subgates = $this->intervalCalculator->getRootSubRangeGates();
+        } else {
+            if ($this->intervalCalculator->isLegal($this->gatename)) {
+                $subgates = $this->intervalCalculator->getSubRangeGates($this->gatename);
+            } else {
+                http_response_code(404);
+                die("Route not found");
+            }
+        }
 
         if ($subgates) {
             foreach($subgates as $gate) {
@@ -56,25 +78,5 @@ class RangeGate
         }
 
         return $graph;
-    }
-
-    private function getSubGates() {
-        $subgates = null;
-        if ($this->gatename === RangeGate::$ROOT_GATE) {
-            $subgates = $this->intervalCalculator->getRootSubRangeGates();
-        } else {
-            if ($this->intervalCalculator->isLegal($this->gatename)) {
-                $subgates = $this->intervalCalculator->getSubRangeGates($this->gatename);
-            } else {
-                http_response_code(404);
-                die("Route not found");
-            }
-        }
-
-        if ($subgates) {
-            return $subgates;
-        } else {
-            return false;
-        }
     }
 }
