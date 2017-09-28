@@ -60,7 +60,6 @@ class Router
         );
 
 
-        // TODO These headers shouldn't be hardcoded
         $this->router->get('/parking/rangegate',
             function() use ($found, $dataset, $fs) {
                 if ($found) {

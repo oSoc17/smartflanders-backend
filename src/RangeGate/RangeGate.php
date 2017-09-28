@@ -26,7 +26,11 @@ class RangeGate
 
         $this->intervalCalculator = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG'], $fs->getOldestTimestamp());
         $this->baseUrl = $this->dataset->getBaseUrl() . '/rangegate/';
-        $this->interval = $this->intervalCalculator->parseIntervalString($this->gatename);
+        if ($this->gatename !== self::$ROOT_GATE) {
+            $this->interval = $this->intervalCalculator->parseIntervalString($this->gatename);
+        } else {
+            $this->interval = [$fs->getOldestTimestamp(), time()];
+        }
     }
 
     public function getGraph() {
