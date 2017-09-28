@@ -59,7 +59,7 @@ class FileReader extends FileSystemProcessor {
 
         $buildingBlocks = $this->statisticBuildingBlocks;
         $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
-        
+
         // Take median of medians, means of the rest
         foreach($sortedStatistics as $parking => $stats) {
             $medians = $stats[$buildingBlocks['median']];

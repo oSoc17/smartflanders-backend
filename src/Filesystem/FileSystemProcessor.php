@@ -6,6 +6,7 @@ namespace oSoc\Smartflanders\Filesystem;
 
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
+use oSoc\Smartflanders\Helpers\IGraphProcessor;
 use pietercolpaert\hardf\TriGWriter;
 
 
@@ -21,7 +22,7 @@ Class FileSystemProcessor {
     protected $res_dirname;
     const REFRESH_STATIC = false;
 
-    public function __construct($out_dirname, $res_dirname, $second_interval, $graph_processor)
+    public function __construct($out_dirname, $res_dirname, $second_interval, IGraphProcessor $graph_processor)
     {
         $this->out_dirname = $out_dirname;
         $this->res_dirname = $res_dirname;
