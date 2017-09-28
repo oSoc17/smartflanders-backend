@@ -59,27 +59,26 @@ class FileReader extends FileSystemProcessor {
 
         $buildingBlocks = $this->statisticBuildingBlocks;
         $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
-
+        
         // Take median of medians, means of the rest
-        $medians = $sortedStatistics[$buildingBlocks['median']];
-        foreach ($medians as $parking => $values) {
-            sort($values);
-            $median = $values[intdiv(count($values), 2)];
+        foreach($sortedStatistics as $parking => $stats) {
+            $medians = $stats[$buildingBlocks['median']];
+            $statCalc = new Helpers\Statistics($medians);
+            $median = $statCalc->median();
             array_push($result, array(
                 'subject' => $parking,
                 'predicate' => $buildingBlocks['median'],
-                'object' => '"' . $median . '"'
+                'object' => Util::createLiteral($median)
             ));
-        }
 
-        foreach(array('mean', 'variance', 'thirdQuartile', 'firstQuartile') as $param) {
-            foreach($sortedStatistics[$buildingBlocks[$param]] as $parking => $values) {
-                $sum = array_sum($values);
-                $mean = $sum / count($values);
+            foreach (array('mean', 'variance', 'thirdQuartile', 'firstQuartile') as $param) {
+                $values = $stats[$buildingBlocks[$param]];
+                $statCalc = new Helpers\Statistics($values);
+                $mean = $statCalc->mean();
                 array_push($result, array(
                     'subject' => $parking,
                     'predicate' => $buildingBlocks[$param],
-                    'object' => '"' . $mean . '"'
+                    'object' => Util::createLiteral($mean)
                 ));
             }
         }
@@ -95,27 +94,28 @@ class FileReader extends FileSystemProcessor {
     private function sortStatisticTriples($statistics) {
         $buildingBlocks = $this->statisticBuildingBlocks;
 
-        $sortedStatistics = array(
-            $buildingBlocks['mean'] => array(),
-            $buildingBlocks['median'] => array(),
-            $buildingBlocks['variance'] => array(),
-            $buildingBlocks['firstQuartile'] => array(),
-            $buildingBlocks['thirdQuartile'] => array()
-        );
+        $sortedStatistics = array();
 
         foreach ($statistics as $triple) {
-            if (!array_key_exists($triple['subject'], $sortedStatistics[$triple['predicate']])) {
-                $sortedStatistics[$triple['predicate']][$triple['subject']] = array();
+            if (!array_key_exists($triple['subject'], $sortedStatistics)) {
+                $sortedStatistics[$triple['subject']] = array(
+                    $buildingBlocks['mean'] => array(),
+                    $buildingBlocks['median'] => array(),
+                    $buildingBlocks['variance'] => array(),
+                    $buildingBlocks['firstQuartile'] => array(),
+                    $buildingBlocks['thirdQuartile'] => array()
+                );
             }
-            $value = intval(Util::getLiteralValue($triple["object"]));
-            array_push($sortedStatistics[$triple["predicate"]][$triple['subject']], $value);
+            $value = doubleval(Util::getLiteralValue($triple["object"]));
+            array_push($sortedStatistics[$triple["subject"]][$triple['predicate']], $value);
         }
+        return $sortedStatistics;
     }
 
     private function getAllStatisticsForInterval($interval) {
         $unix = $interval[0];
         $statistics = array();
-        while ($unix < $interval[1]) {
+        while (strtotime(date('Y-m-d', $unix)) <= $interval[1]) {
             $filename = date('Y-m-d', $unix);
             if ($this->stat_fs->has($filename)) {
                 $contents = $this->stat_fs->read($filename);
