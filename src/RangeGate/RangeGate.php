@@ -68,7 +68,7 @@ class RangeGate
                 if ($this->gatename !== self::$ROOT_GATE) {
                     $subject = $subject . $this->gatename;
                 }
-                $gate = date("Y-m-d\TH:i:s", $gate[0]) . '_' . date("Y-m-d\TH:i:s", $gate[1]);
+                $gate = date("Y-m-d", $gate[0]) . '_' . date("Y-m-d", $gate[1]);
                 $object = $this->baseUrl . $gate;
                 $graph = TripleHelper::addTriple($graph, $subject, 'mdi:hasRangeGate', $object);
             }
@@ -76,7 +76,7 @@ class RangeGate
             // Next level is leaf level. Get all appropriate files.
             $rangeFragmentsUnix = $this->fs->getFilesBetween($this->interval[0], $this->interval[1]);
             foreach($rangeFragmentsUnix as $rfu) {
-                $rfu_iso = date("Y-m-d\TH:i:s", $rfu);
+                $rfu_iso = date("Y-m-d", $rfu);
                 $subject = $this->baseUrl . $this->gatename;
                 $object = $this->dataset->getBaseUrl() . "?page=" . $rfu_iso;
                 $graph = TripleHelper::addTriple($graph, $subject, 'mdi:hasRangeGate', $object);
