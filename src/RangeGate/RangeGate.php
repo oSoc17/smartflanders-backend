@@ -3,6 +3,8 @@
 namespace oSoc\Smartflanders\RangeGate;
 
 use Dotenv\Dotenv;
+use oSoc\Smartflanders\Filesystem\FileSystemProcessor;
+use oSoc\Smartflanders\Helpers\IGraphProcessor;
 use oSoc\Smartflanders\Helpers\TripleHelper;
 
 class RangeGate
@@ -16,7 +18,7 @@ class RangeGate
 
     public static $ROOT_GATE = 'ROOT_GATE';
 
-    public function __construct($gatename, $dataset, $fs) {
+    public function __construct($gatename, IGraphProcessor $dataset, FileSystemProcessor $fs) {
         $this->gatename = $gatename;
         $this->dataset = $dataset;
         $this->fs = $fs;

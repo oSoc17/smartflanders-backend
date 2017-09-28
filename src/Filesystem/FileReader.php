@@ -7,6 +7,13 @@ use oSoc\Smartflanders\Helpers;
 
 class FileReader extends FileSystemProcessor {
 
+    private $statisticBuildingBlocks = array(
+        'mean' => 'http://datapiloten.be/vocab/timeseries#mean',
+        'median' => 'http://datapiloten.be/vocab/timeseries#median',
+        'variance' => 'http://datapiloten.be/vocab/timeseries#variance',
+        'firstQuartile' => 'http://datapiloten.be/vocab/timeseries#firstQuartile',
+        'thirdQuartile' => 'http://datapiloten.be/vocab/timeseries#thirdQuartile'
+    );
 
     public function getFullyDressedGraphsFromFile($filename) {
         $dynamic_parser = new TriGParser(["format" => "trig"]);
@@ -50,42 +57,8 @@ class FileReader extends FileSystemProcessor {
     public function getStatisticalSummary($interval) {
         $result = array();
 
-        $buildingBlocks = array(
-            'mean' => 'http://datapiloten.be/vocab/timeseries#mean',
-            'median' => 'http://datapiloten.be/vocab/timeseries#hasMedian',
-            'variance' => 'http://datapiloten.be/vocab/timeseries#variance',
-            'firstQuartile' => 'http://datapiloten.be/vocab/timeseries#firstQuartile',
-            'thirdQuartile' => 'http://datapiloten.be/vocab/timeseries#thirdQuartile'
-        );
-
-        $sortedStatistics = array(
-            $buildingBlocks['mean'] => array(),
-            $buildingBlocks['median'] => array(),
-            $buildingBlocks['variance'] => array(),
-            $buildingBlocks['firstQuartile'] => array(),
-            $buildingBlocks['thirdQuartile'] => array()
-        );
-
-        $unix = $interval[0];
-        $statistics = array();
-        while ($unix < $interval[1]) {
-            $filename = date('Y-m-d', $unix);
-            if ($this->stat_fs->has($filename)) {
-                $contents = $this->stat_fs->read($filename);
-                $parser = new TriGParser(["format" => "trig"]);
-                $triples = $parser->parse($contents);
-                $statistics = array_merge($statistics, $triples);
-            }
-            $unix += 60*60*24;
-        }
-
-        foreach ($statistics as $triple) {
-            if (!array_key_exists($triple['subject'], $sortedStatistics[$triple['predicate']])) {
-                $sortedStatistics[$triple['predicate']][$triple['subject']] = array();
-            }
-            $value = intval(Util::getLiteralValue($triple["object"]));
-            array_push($sortedStatistics[$triple["predicate"]][$triple['subject']], $value);
-        }
+        $buildingBlocks = $this->statisticBuildingBlocks;
+        $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
 
         // Take median of medians, means of the rest
         $medians = $sortedStatistics[$buildingBlocks['median']];
@@ -117,6 +90,42 @@ class FileReader extends FileSystemProcessor {
     public function getStaticData() {
         $static_parser = new TriGParser(["format" => "trig"]);
         return $static_parser->parse($this->res_fs->read($this->static_data_filename));
+    }
+
+    private function sortStatisticTriples($statistics) {
+        $buildingBlocks = $this->statisticBuildingBlocks;
+
+        $sortedStatistics = array(
+            $buildingBlocks['mean'] => array(),
+            $buildingBlocks['median'] => array(),
+            $buildingBlocks['variance'] => array(),
+            $buildingBlocks['firstQuartile'] => array(),
+            $buildingBlocks['thirdQuartile'] => array()
+        );
+
+        foreach ($statistics as $triple) {
+            if (!array_key_exists($triple['subject'], $sortedStatistics[$triple['predicate']])) {
+                $sortedStatistics[$triple['predicate']][$triple['subject']] = array();
+            }
+            $value = intval(Util::getLiteralValue($triple["object"]));
+            array_push($sortedStatistics[$triple["predicate"]][$triple['subject']], $value);
+        }
+    }
+
+    private function getAllStatisticsForInterval($interval) {
+        $unix = $interval[0];
+        $statistics = array();
+        while ($unix < $interval[1]) {
+            $filename = date('Y-m-d', $unix);
+            if ($this->stat_fs->has($filename)) {
+                $contents = $this->stat_fs->read($filename);
+                $parser = new TriGParser(["format" => "trig"]);
+                $triples = $parser->parse($contents);
+                $statistics = array_merge($statistics, $triples);
+            }
+            $unix += 60*60*24;
+        }
+        return $statistics;
     }
 
     // Get the contents of a file

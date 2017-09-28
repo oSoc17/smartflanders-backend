@@ -2,6 +2,8 @@
 
 namespace oSoc\Smartflanders\Filesystem;
 
+// TODO File system processor/reader/writer is bad design (lots of dependencies on each other). Redesign.
+
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
 use pietercolpaert\hardf\TriGWriter;
@@ -88,11 +90,11 @@ Class FileSystemProcessor {
         if ($oldest) {
             $timestamp = $this->roundTimestamp($timestamp);
             while ($timestamp > $oldest) {
-                $timestamp -= $this->second_interval;
                 $filename = $this->roundTimestamp($timestamp);
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
                 }
+                $timestamp -= $this->second_interval;
             }
         }
         return false;
