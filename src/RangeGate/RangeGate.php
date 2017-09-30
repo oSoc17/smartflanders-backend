@@ -6,6 +6,7 @@ use Dotenv\Dotenv;
 use oSoc\Smartflanders\Filesystem\FileSystemProcessor;
 use oSoc\Smartflanders\Helpers\IGraphProcessor;
 use oSoc\Smartflanders\Helpers\TripleHelper;
+use pietercolpaert\hardf\Util;
 
 class RangeGate
 {
@@ -31,7 +32,7 @@ class RangeGate
         if ($this->gatename !== self::$ROOT_GATE) {
             $this->interval = $this->intervalCalculator->parseIntervalString($this->gatename);
         } else {
-            $this->interval = [$fs->getOldestTimestamp(), time()];
+            $this->interval = [$fs->getOldestTimestamp(), time() + 60*60*24]; // TODO this hack ensures all data is included. Ugly, might have a better solution.
         }
     }
 
@@ -40,11 +41,37 @@ class RangeGate
         $reader = $this->fs->getFileReader();
         $staticData = $reader->getStaticData();
         $summary = $reader->getStatisticalSummary($this->interval);
+        $borders = $this->getInitAndFinal();
 
         $graph["triples"] = array_merge($graph["triples"], $staticData);
         $graph["triples"] = array_merge($graph["triples"], $summary);
+        $graph["triples"] = array_merge($graph["triples"], $borders);
 
         return $graph;
+    }
+
+    private function getInitAndFinal() {
+        $result = array();
+        $subject = $this->baseUrl;
+        if ($this->gatename !== self::$ROOT_GATE) {
+            $subject = $subject . $this->gatename;
+        }
+
+        $init = Util::createLiteral(date('c', $this->interval[0]), 'http://www.w3.org/2001/XMLSchema#dateTime');
+        $final = Util::createLiteral(date('c', $this->interval[1]), 'http://www.w3.org/2001/XMLSchema#dateTime');
+
+        array_push($result, [
+            'subject' => $subject,
+            'predicate' => 'mdi:initial',
+            'object' => $init
+        ]);
+        array_push($result, [
+            'subject' => $subject,
+            'predicate' => 'mdi:final',
+            'object' => $final
+        ]);
+
+        return $result;
     }
 
     private function getSubGates() {
