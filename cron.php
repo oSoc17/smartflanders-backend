@@ -47,7 +47,9 @@ function acquire_data() {
             // TODO add out and resources directories to .env. Right now Dutch dataset class has dependency on this.
             $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
             $graph = $processor->getDynamicGraph();
-            $fs->writeToFile(time(), $graph);
+            $now = time();
+            $fs->writeToFile($now, $graph);
+            $fs->updateStatisticalSummary($now, $graph);
         }
     }
 }

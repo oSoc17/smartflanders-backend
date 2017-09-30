@@ -34,7 +34,6 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
             $graph = Helpers\TripleHelper::addTriple($graph, $subject, 'datex:parkingNumberOfVacantSpaces','"' . $parking['vrij'] . '"');
         }
 
-        // TODO Do we need $multigraph?
         $multigraph = [
             'prefixes' => $graph["prefixes"],
             'triples' => []

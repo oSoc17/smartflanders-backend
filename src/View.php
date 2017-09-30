@@ -13,11 +13,6 @@ use oSoc\Smartflanders\Helpers;
 
 Class View
 {
-    /**
-     * @param $acceptHeader
-     * @param $historic
-     * @return mixed
-     */
     private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
@@ -40,29 +35,100 @@ Class View
         return $value;
     }
 
-    /**
-     * @param $acceptHeader
-     * @param $graph
-     * @param $historic
-     */
-    public static function view($acceptHeader, $graph, $historic, $base_url, $rt_max_age){
-        $value = self::headers($acceptHeader, $historic, $rt_max_age);
-        $metadata = Helpers\Metadata::get($base_url);
-        foreach ($metadata as $quad) {
-            array_push($graph["triples"], $quad);
-        }
-        Helpers\Metadata::addMeasurementMetadata($graph);
-        Helpers\Metadata::addCountsToGraph($graph, $base_url);
+    public static function viewRangeGate($rangegate) {
+        // TODO content negotiation, cache headers
+        header("Content-type: text/turtle");
+        header("Cache-Control: max-age=31536000");
+        header("Access-Control-Allow-Origin: *");
+        header("Vary: Accept");
+        $graph = $rangegate->getGraph();
+        $writer = new TriGWriter(["format" => "text/turtle"]);
+        $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+        $writer->addTriples($graph["triples"]);
+        echo $writer->end();
+    }
 
-        if ($value === 'application/trig') {
-            $writer = new TriGWriter(["format" => $value]);
-            $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
-            $writer->addTriples($graph["triples"]);
-            echo $writer->end();
-        } else if ($value === 'application/xml') {
-            $writer = new Helpers\DatexSerializer();
-            $writer->addTriples($graph["triples"]);
-            echo $writer->serialize();
+    public static function view($graph_processor, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
+        if (in_array($graph_processor, $processors_gather)) {
+            // This data is being gathered here, get the file
+            // If no preferred content type is specified, prefer turtle
+            if (!array_key_exists('HTTP_ACCEPT', $_SERVER)) {
+                $_SERVER['HTTP_ACCEPT'] = 'application/trig';
+            }
+
+            $filename = null;
+
+            $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+
+            if (!isset($_GET['page']) && !isset($_GET['time'])) {
+                $timestamp = $fs->getLastPage();
+                $filename = date("Y-m-d\TH:i:s", $timestamp);
+            }
+
+            else if (isset($_GET['page'])) {
+                // If page name is provided, it must be exact
+                $filename = strtotime($_GET['page']);
+                if (!$fs->hasFile($filename)) {
+                    http_response_code(404);
+                    die("Page not found");
+                }
+            }
+
+            else if (isset($_GET['time'])) {
+                // If timestamp is provided, find latest file before timestamp
+                $timestamp = $fs->getPreviousTimestampFromTimestamp(strtotime($_GET['time']));
+                $filename = date("Y-m-d\TH:i:s", $timestamp);
+                if (!$filename) {
+                    http_response_code(404);
+                    die("Time not found");
+                }
+            }
+
+            if (!isset($_GET['page'])) {
+                header("Access-Control-Allow-Origin: *");
+                header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $filename);
+            } else {
+                // This is sloppy coding
+                $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+                $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
+                $historic = true;
+                if ((string)$filename === $fs->getLastPage()) {
+                    $historic = false;
+                }
+                $value = self::headers($_SERVER['HTTP_ACCEPT'], $historic, $graph_processor->getRealTimeMaxAge());
+                $metadata = Helpers\Metadata::get($graph_processor->getBaseUrl());
+                foreach ($metadata as $quad) {
+                    array_push($graphs["triples"], $quad);
+                }
+                Helpers\Metadata::addMeasurementMetadata($graphs);
+                Helpers\Metadata::addCountsToGraph($graphs, $graph_processor->getBaseUrl());
+
+                if ($value === 'application/trig') {
+                    $writer = new TriGWriter(["format" => $value]);
+                    $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+                    $writer->addTriples($graphs["triples"]);
+                    echo $writer->end();
+                } else if ($value === 'application/xml') {
+                    $writer = new Helpers\DatexSerializer();
+                    $writer->addTriples($graphs["triples"]);
+                    echo $writer->serialize();
+                }
+            }
+        } else {
+            // This data is not being gathered here, the base URL redirects to somewhere else
+            // Just copy arguments and redirect
+            if (isset($_GET['page'])) {
+                header("Access-Control-Allow-Origin: *");
+                header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $_GET['page']);
+            } else if (isset($_GET['time'])) {
+                header("Access-Control-Allow-Origin: *");
+                header('Location: ' . $graph_processor->getBaseUrl() . '?time=' . $_GET['time']);
+            } else {
+                header("Access-Control-Allow-Origin: *");
+                header('Location: ' . $graph_processor->getBaseUrl());
+            }
         }
+
+
     }
 }
