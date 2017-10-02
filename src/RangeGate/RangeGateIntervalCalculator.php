@@ -29,12 +29,13 @@ class RangeGateIntervalCalculator
             $seconds = $this->units[$unit] * $num;
             array_push($this->levels, $seconds);
         }
+
     }
 
     public function isLegal($intervalString) {
-        // Interval string is of form YYYY-MM-DDThh:mm:ss_YYYY-MM-DDThh:mm:ss
+        // Interval string is of form YYYY-MM-DD_YYYY-MM-DD
         $interval = $this->parseIntervalString($intervalString);
-        $diff = $interval[1] - $interval[0];
+        $diff = $this->roundDiff($interval[1] - $interval[0]);
 
         if ($diff === 0) {
             return false;
@@ -56,12 +57,16 @@ class RangeGateIntervalCalculator
     // Returns an array of sub range gates or false if next level is leaf level
     public function getSubRangeGates($intervalString) {
         $interval = $this->parseIntervalString($intervalString);
-        $level_index = array_search($interval[1] - $interval[0], $this->levels);
+        $level_index = array_search($this->roundDiff($interval[1] - $interval[0]), $this->levels);
         return $this->calculateSubRangeGates($level_index, $interval[0]);
     }
 
     public function getRootSubRangeGates() {
         return $this->calculateSubRangeGates(-1, $this->oldest);
+    }
+
+    private function roundDiff($diff) {
+        return $diff + 60*60*24 - $diff % (60*60*24); // Round up to nearest day
     }
 
     private function calculateSubRangeGates($level_index, $lower_bound) {
