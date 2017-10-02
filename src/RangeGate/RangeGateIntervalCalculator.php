@@ -8,10 +8,10 @@ class RangeGateIntervalCalculator
     private $levels = array();
     private $oldest = 0;
     private $units = array(
-        'Y' => 60*60*24*365,
-        'M' => 60*60*24*30,
-        'W' => 60*60*24*7,
-        'D' => 60*60*24
+        'Y' => 365,
+        'M' => 30,
+        'W' => 7,
+        'D' => 1
     );
 
     public function __construct($configString, $oldest_timestamp) {
@@ -26,8 +26,8 @@ class RangeGateIntervalCalculator
         foreach($exploded as $level) {
             $num = intval(substr($level, 0, 1));
             $unit = substr($level, 1, 1);
-            $seconds = $this->units[$unit] * $num;
-            array_push($this->levels, $seconds);
+            $days = $this->units[$unit] * $num;
+            array_push($this->levels, $days);
         }
 
     }
@@ -35,7 +35,7 @@ class RangeGateIntervalCalculator
     public function isLegal($intervalString) {
         // Interval string is of form YYYY-MM-DD_YYYY-MM-DD
         $interval = $this->parseIntervalString($intervalString);
-        $diff = $this->roundDiff($interval[1] - $interval[0]);
+        $diff = $this->dayDiff($interval);
 
         if ($diff === 0) {
             return false;
@@ -57,7 +57,7 @@ class RangeGateIntervalCalculator
     // Returns an array of sub range gates or false if next level is leaf level
     public function getSubRangeGates($intervalString) {
         $interval = $this->parseIntervalString($intervalString);
-        $level_index = array_search($this->roundDiff($interval[1] - $interval[0]), $this->levels);
+        $level_index = array_search($this->dayDiff($interval), $this->levels);
         return $this->calculateSubRangeGates($level_index, $interval[0]);
     }
 
@@ -65,14 +65,17 @@ class RangeGateIntervalCalculator
         return $this->calculateSubRangeGates(-1, $this->oldest);
     }
 
-    private function roundDiff($diff) {
-        return $diff + 60*60*24 - $diff % (60*60*24); // Round up to nearest day
+    private function dayDiff($interval) {
+        $from = new \DateTime(date('c', $interval[0]));
+        $to = new \DateTime(date('c', $interval[1]));
+        $diff = $from->diff($to);
+        return $diff->days;
     }
 
     private function calculateSubRangeGates($level_index, $lower_bound) {
         $result = array();
         if ($level_index < count($this->levels)-1) {
-            $sub_level = $this->levels[$level_index + 1];
+            $sub_level = $this->levels[$level_index + 1]*60*60*24;
             $start = $lower_bound; $end = $start + $sub_level;
             array_push($result, array($start, $end));
             if ($level_index > -1) {
