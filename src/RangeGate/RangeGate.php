@@ -58,7 +58,7 @@ class RangeGate
         }
 
         $init = Util::createLiteral($this->interval[0]->format('Y-m-d\T00:00:00'), 'http://www.w3.org/2001/XMLSchema#dateTime');
-        $final = Util::createLiteral($this->interval[1]->format('Y-m-d\T23:59:59'), 'http://www.w3.org/2001/XMLSchema#dateTime');
+        $final = Util::createLiteral($this->interval[1]->format('Y-m-d\T00:00:00'), 'http://www.w3.org/2001/XMLSchema#dateTime');
 
         array_push($result, [
             'subject' => $subject,
