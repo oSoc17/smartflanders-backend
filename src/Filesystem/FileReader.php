@@ -56,7 +56,6 @@ class FileReader extends FileSystemProcessor {
 
     public function getStatisticalSummary($interval) {
         $result = array();
-
         $buildingBlocks = $this->statisticBuildingBlocks;
         $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
 
@@ -113,7 +112,7 @@ class FileReader extends FileSystemProcessor {
     }
 
     private function getAllStatisticsForInterval($interval) {
-        $cur = $interval[0];
+        $cur = clone $interval[0];
         $statistics = array();
         while ($cur <= $interval[1]) {
             $filename = $cur->format('Y-m-d');
