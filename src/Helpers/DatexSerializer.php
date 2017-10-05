@@ -96,9 +96,9 @@ class DatexSerializer
                     'parkingRecordReference' => array(
                         '@attributes' => array('targetClass' => 'ParkingRecord', 'version' => '4', 'id' => $measurement['subject'])
                     ),
-                    'parkingStatusOriginTime' => Util::getLiteralValue($gentimes[$measurement['graph']]),
+                    'parkingStatusOriginTime' => $gentimes[$measurement['graph']],
                     'parkingOccupancy' => array(
-                        'parkingNumberOfVacantSpaces' => Util::getLiteralValue($measurement['object'])
+                        'parkingNumberOfVacantSpaces' => $measurement['object']
                     ),
                     'parkingSiteStatus' => 'spacesAvailable', // TODO don't hardcode this!
                 );
