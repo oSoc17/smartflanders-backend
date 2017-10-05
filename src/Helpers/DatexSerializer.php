@@ -96,9 +96,9 @@ class DatexSerializer
                     'parkingRecordReference' => array(
                         '@attributes' => array('targetClass' => 'ParkingRecord', 'version' => '4', 'id' => $measurement['subject'])
                     ),
-                    'parkingStatusOriginTime' => $gentimes[$measurement['graph']],
+                    'parkingStatusOriginTime' => Util::getLiteralValue($gentimes[$measurement['graph']]),
                     'parkingOccupancy' => array(
-                        'parkingNumberOfVacantSpaces' => $measurement['object']
+                        'parkingNumberOfVacantSpaces' => Util::getLiteralValue($measurement['object'])
                     ),
                     'parkingSiteStatus' => 'spacesAvailable', // TODO don't hardcode this!
                 );
@@ -113,11 +113,11 @@ class DatexSerializer
             $numOfSpaces = '';
             foreach($parking as $triple) {
                 if ($triple['predicate'] === 'http://www.w3.org/2000/01/rdf-schema#label') {
-                    $label = $triple['object'];
+                    $label = Util::getLiteralValue($triple['object']);
                 } else if ($triple['predicate'] === 'http://purl.org/dc/terms/description') {
-                    $description = $triple['object'];
+                    $description = Util::getLiteralValue($triple['object']);
                 } else if ($triple['predicate'] === 'http://vocab.datex.org/terms#parkingNumberOfSpaces') {
-                    $numOfSpaces = $triple['object'];
+                    $numOfSpaces = Util::getLiteralValue($triple['object']);
                 }
             }
             $parkingSite = array(
