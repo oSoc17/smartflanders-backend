@@ -32,7 +32,7 @@ class RangeGate
         if ($this->gatename !== self::$ROOT_GATE) {
             $this->interval = $this->intervalCalculator->parseIntervalString($this->gatename);
         } else {
-            $this->interval = [$fs->getOldestTimestamp(), time() + 60*60*24]; // TODO this hack ensures all data is included. Ugly, might have a better solution.
+            $this->interval = [\DateTime::createFromFormat('U', $fs->getOldestTimestamp()), new \DateTime()];
         }
     }
 
@@ -57,8 +57,8 @@ class RangeGate
             $subject = $subject . $this->gatename;
         }
 
-        $init = Util::createLiteral(date('c', $this->interval[0]), 'http://www.w3.org/2001/XMLSchema#dateTime');
-        $final = Util::createLiteral(date('c', $this->interval[1]), 'http://www.w3.org/2001/XMLSchema#dateTime');
+        $init = Util::createLiteral($this->interval[0]->format('c'), 'http://www.w3.org/2001/XMLSchema#dateTime');
+        $final = Util::createLiteral($this->interval[1]->format('c'), 'http://www.w3.org/2001/XMLSchema#dateTime');
 
         array_push($result, [
             'subject' => $subject,
@@ -95,15 +95,15 @@ class RangeGate
                 if ($this->gatename !== self::$ROOT_GATE) {
                     $subject = $subject . $this->gatename;
                 }
-                $gate = date("Y-m-d", $gate[0]) . '_' . date("Y-m-d", $gate[1]);
-                $object = $this->baseUrl . $gate;
+                $gatename = $gate[0]->format('Y-m-d') . '_' . $gate[1]->format('Y-m-d');
+                $object = $this->baseUrl . $gatename;
                 $graph = TripleHelper::addTriple($graph, $subject, 'mdi:hasRangeGate', $object);
             }
         } else {
             // Next level is leaf level. Get all appropriate files.
-            $rangeFragmentsUnix = $this->fs->getFilesBetween($this->interval[0], $this->interval[1]);
+            $rangeFragmentsUnix = $this->fs->getFilesForDay($this->interval[0]);
             foreach($rangeFragmentsUnix as $rfu) {
-                $rfu_iso = date("Y-m-d", $rfu);
+                $rfu_iso = date("Y-m-d\TH:i:s", $rfu);
                 $subject = $this->baseUrl . $this->gatename;
                 $object = $this->dataset->getBaseUrl() . "?page=" . $rfu_iso;
                 $graph = TripleHelper::addTriple($graph, $subject, 'mdi:hasRangeGate', $object);

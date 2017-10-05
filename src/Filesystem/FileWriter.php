@@ -45,7 +45,7 @@ class FileWriter extends FileSystemProcessor {
         $filename = date("Y-m-d", $timestamp);
         $now = time();
         $start = $now - $now % (60*60*24);
-        $files = $this->getFilesBetween($start, $now);
+        $files = $this->getFilesForDay(\DateTime::createFromFormat('U', $timestamp));
 
         // Get all relevant triples from files
         $measurements = array();
