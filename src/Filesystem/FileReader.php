@@ -148,6 +148,7 @@ class FileReader extends FileSystemProcessor {
     private function getPreviousFileFromTimestamp($timestamp) {
         $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
+            $prev_ts -= $this->second_interval;
             return date("Y-m-d\TH:i:s", $prev_ts);
         }
         return false;
