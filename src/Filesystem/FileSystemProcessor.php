@@ -45,9 +45,12 @@ Class FileSystemProcessor {
         }
     }
 
-    public function getFilesBetween($start, $end) {
+    public function getFilesForDay(\DateTime $day) {
         $result = array();
-        $start = $this->getPreviousTimestampFromTimestamp($start);
+        $start = $day->format('U'); // To unix
+        $start = $start - ($start % 60*60*24); // Round down to day
+        $start = $this->getPreviousTimestampFromTimestamp($start); // Get valid timestamp
+        $end = $start + 60*60*24;
         for ($i = $start; $i < $end; $i += $this->second_interval) {
             if ($this->hasFile($i)) {
                 array_push($result, $i);

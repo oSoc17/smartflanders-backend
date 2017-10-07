@@ -56,7 +56,6 @@ class FileReader extends FileSystemProcessor {
 
     public function getStatisticalSummary($interval) {
         $result = array();
-
         $buildingBlocks = $this->statisticBuildingBlocks;
         $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
 
@@ -113,17 +112,17 @@ class FileReader extends FileSystemProcessor {
     }
 
     private function getAllStatisticsForInterval($interval) {
-        $unix = $interval[0];
+        $cur = clone $interval[0];
         $statistics = array();
-        while (strtotime(date('Y-m-d', $unix)) <= $interval[1]) {
-            $filename = date('Y-m-d', $unix);
+        while ($cur <= $interval[1]) {
+            $filename = $cur->format('Y-m-d');
             if ($this->stat_fs->has($filename)) {
                 $contents = $this->stat_fs->read($filename);
                 $parser = new TriGParser(["format" => "trig"]);
                 $triples = $parser->parse($contents);
                 $statistics = array_merge($statistics, $triples);
             }
-            $unix += 60*60*24;
+            $cur->add(new \DateInterval('P1D'));
         }
         return $statistics;
     }
@@ -149,6 +148,7 @@ class FileReader extends FileSystemProcessor {
     private function getPreviousFileFromTimestamp($timestamp) {
         $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
+            $prev_ts -= $this->second_interval;
             return date("Y-m-d\TH:i:s", $prev_ts);
         }
         return false;

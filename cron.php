@@ -49,7 +49,8 @@ function acquire_data() {
             $graph = $processor->getDynamicGraph();
             $now = time();
             $fs->writeToFile($now, $graph);
-            $fs->updateStatisticalSummary($now, $graph);
+            // Temporarily disabling range gates, semantically incorrect
+            //$fs->updateStatisticalSummary($now, $graph);
         }
     }
 }
