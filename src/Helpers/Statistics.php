@@ -40,6 +40,9 @@ class Statistics
         foreach($this->data as $d) {
             $numerator += ($d-$mean)**2;
         }
-        return $numerator/(count($this->data)-1);
+        if (count($this->data) > 1) {
+            return $numerator/(count($this->data)-1);
+        }
+        return $numerator/count($this->data);
     }
 }

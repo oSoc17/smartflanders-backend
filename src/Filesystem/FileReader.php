@@ -60,7 +60,9 @@ class FileReader extends FileSystemProcessor {
         $sortedStatistics = $this->sortStatisticTriples($this->getAllStatisticsForInterval($interval));
 
         // Take median of medians, means of the rest
-        foreach($sortedStatistics as $parking => $stats) {
+        foreach($sortedStatistics as $summ => $stats) {
+            $parking = $stats['rdf:subject'];
+            // TODO FIRST FIX THIS
             $medians = $stats[$buildingBlocks['median']];
             $statCalc = new Helpers\Statistics($medians);
             $median = $statCalc->median();
@@ -92,6 +94,11 @@ class FileReader extends FileSystemProcessor {
 
     private function sortStatisticTriples($statistics) {
         $buildingBlocks = $this->statisticBuildingBlocks;
+        $buildingBlocks['rdf:type'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+        $buildingBlocks['rdf:predicate'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate';
+        $buildingBlocks['rdf:subject'] = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#subject';
+        $buildingBlocks['time:hasBeginning'] = 'https://www.w3.org/TR/owl-time/hasBeginning';
+        $buildingBlocks['time:hasEnd'] = 'https://www.w3.org/TR/owl-time/hasEnd';
 
         $sortedStatistics = array();
 
@@ -105,8 +112,40 @@ class FileReader extends FileSystemProcessor {
                     $buildingBlocks['thirdQuartile'] => array()
                 );
             }
-            $value = doubleval(Util::getLiteralValue($triple["object"]));
-            array_push($sortedStatistics[$triple["subject"]][$triple['predicate']], $value);
+            if ($triple["predicate"] === $buildingBlocks['rdf:type']) {
+                $sortedStatistics[$triple['subject']]['rdf:type'] = $triple['object'];
+            } else if ($triple["predicate"] === $buildingBlocks['rdf:predicate']) {
+                $sortedStatistics[$triple['subject']]['rdf:predicate'] = $triple['object'];
+            } else if ($triple["predicate"] === $buildingBlocks['rdf:subject']) {
+                $sortedStatistics[$triple['subject']]['rdf:subject'] = $triple['object'];
+            } else if ($triple["predicate"] === $buildingBlocks['time:hasBeginning']) {
+                $curBeginning = $sortedStatistics['time:hasBeginning'];
+                if ($curBeginning === null) {
+                    $sortedStatistics['time:hasBeginning'] = $triple['object'];
+                } else {
+                    $curBeginningDateTime = new \DateTime(Util::getLiteralValue($curBeginning));
+                    $beginningDateTime = new \DateTime(Util::getLiteralValue($triple['object']));
+                    if ($beginningDateTime < $curBeginningDateTime) {
+                        $lit = Util::createLiteral($triple['object'], 'http://www.w3.org/2001/XMLSchema#dateTime');
+                        $sortedStatistics['time:hasBeginning'] = $lit;
+                    }
+                }
+            } else if ($triple["predicate"] === $buildingBlocks['time:hasEnd']) {
+                $curEnd = $sortedStatistics['time:hasEnd'];
+                if ($curEnd === null) {
+                    $sortedStatistics['time:hasEnd'] = $triple['object'];
+                } else {
+                    $curEndDateTime = new \DateTime(Util::getLiteralValue($curEnd));
+                    $endDateTime = new \DateTime(Util::getLiteralValue($triple['object']));
+                    if ($endDateTime > $curEndDateTime) {
+                        $lit = Util::createLiteral($triple['object'], 'http://www.w3.org/2001/XMLSchema#dateTime');
+                        $sortedStatistics['time:hasEnd'] = $lit;
+                    }
+                }
+            } else {
+                $value = doubleval(Util::getLiteralValue($triple["object"]));
+                array_push($sortedStatistics[$triple["subject"]][$triple['predicate']], $value);
+            }
         }
         return $sortedStatistics;
     }
