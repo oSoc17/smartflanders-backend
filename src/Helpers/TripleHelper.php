@@ -54,7 +54,9 @@ class TripleHelper
             "rdf" => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
             "foaf" => "http://xmlns.com/foaf/0.1/",
             "cc" => "http://creativecommons.org/ns#",
-            "mdi" => 'http://w3id.org/multidimensional-interface/ontology#'
+            "mdi" => 'http://w3id.org/multidimensional-interface/ontology#',
+            "time" => 'https://www.w3.org/TR/owl-time/',
+            "ts" => 'http://datapiloten.be/vocab/timeseries#'
         ];
     }
 }
