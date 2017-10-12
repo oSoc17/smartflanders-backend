@@ -16,7 +16,7 @@ Class View
     private static function headers($acceptHeader, $historic, $rt_max_age) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
-        $priorities = array('application/trig','application/xml');
+        $priorities = array('application/trig','application/xml', 'application/ld+json');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
         $value = $mediaType->getValue();
         header("Content-type: $value");
@@ -110,6 +110,11 @@ Class View
                     echo $writer->end();
                 } else if ($value === 'application/xml') {
                     $writer = new Helpers\DatexSerializer();
+                    $writer->addTriples($graphs["triples"]);
+                    echo $writer->serialize();
+                } else if ($value === 'application/ld+json') {
+                    $writer = new Helpers\JSONLDWriter();
+                    $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
                     $writer->addTriples($graphs["triples"]);
                     echo $writer->serialize();
                 }
