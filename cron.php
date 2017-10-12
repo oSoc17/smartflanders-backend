@@ -46,11 +46,14 @@ function acquire_data() {
             $interval = 60*60*3; // 3 hour interval results in files of a few 100 KB
             // TODO add out and resources directories to .env. Right now Dutch dataset class has dependency on this.
             $fs = new Filesystem\FileWriter(__DIR__ . "/out", __DIR__ . "/resources", $interval, $processor);
+            echo "Fetching graph for " . $processor->getName() . "\n";
             $graph = $processor->getDynamicGraph();
             $now = time();
+            echo "Writing data for " . $processor->getName() . "\n";
             $fs->writeToFile($now, $graph);
             // Temporarily disabling range gates, semantically incorrect
-            //$fs->updateStatisticalSummary($now, $graph);
+            echo "Updating statistical summary for " . $processor->getName() . "\n";
+            $fs->updateStatisticalSummary($now, $graph);
         }
     }
 }

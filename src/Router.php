@@ -59,8 +59,6 @@ class Router
             }
         );
 
-        // Temporarily disabling range gates, semantically incorrect
-        /*
         $this->router->get('/parking/rangegate',
             function() use ($found, $dataset, $fs) {
                 if ($found) {
@@ -81,7 +79,7 @@ class Router
                     echo "Dataset not found.<br>";
                 }
             }
-        );*/
+        );
     }
 
     public function run() {
