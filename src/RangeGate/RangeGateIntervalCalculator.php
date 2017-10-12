@@ -87,8 +87,8 @@ class RangeGateIntervalCalculator
                 $upper_bound = clone $lower_bound;
                 $upper_bound->add(new \DateInterval('P' . $this->levels[$level_index] . 'D'));
                 while ($end <= $upper_bound && $end <= new \DateTime()) {
-                    $start->add(new \DateInterval('P' . ($sub_level+1) . 'D'));
-                    $end->add(new \DateInterval('P' . ($sub_level+1) . 'D'));
+                    $start->add(new \DateInterval('P' . ($sub_level) . 'D'));
+                    $end->add(new \DateInterval('P' . ($sub_level) . 'D'));
                     array_push($result, array(clone $start, clone $end));
                 }
             } else {

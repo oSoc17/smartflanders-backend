@@ -49,6 +49,7 @@ class FileWriter extends FileSystemProcessor {
 
         // Get all relevant triples from files
         $measurements = array();
+        $oldest = null; $latest = null;
         foreach ($files as $file) {
             $relevantSubgraphs = array();
             $parser = new TriGParser();
@@ -57,6 +58,9 @@ class FileWriter extends FileSystemProcessor {
             foreach($triples as $triple) {
                 if ($triple["predicate"] === 'http://www.w3.org/ns/prov#generatedAtTime') {
                     if (substr(Util::getLiteralValue($triple["object"]), 0, 10) === $filename) {
+                        $datetime = new \DateTime(Util::getLiteralValue($triple["object"]));
+                        if ($oldest === null || $datetime < $oldest) $oldest = $datetime;
+                        if ($latest === null || $datetime > $latest) $latest = $datetime;
                         array_push($relevantSubgraphs, $triple["subject"]);
                     }
                 }
@@ -80,23 +84,36 @@ class FileWriter extends FileSystemProcessor {
 
         // Calculate statistics for each parking
         $output = array();
+        $index = 0;
         foreach ($sortedMeasurements as $p => $ms) {
+            $summaryURL = "#summary" . $index;
             $stat = new Helpers\Statistics($ms);
             $median = Util::createLiteral($stat->median());
             $mean = Util::createLiteral($stat->mean());
             $var = Util::createLiteral($stat->variance());
             $firstq = Util::createLiteral($stat->percentile(0.25));
             $thirdq = Util::createLiteral($stat->percentile(0.75));
-            array_push($output, ["subject" => $p, "predicate" => "stat:median", "object" => $median]);
-            array_push($output, ["subject" => $p, "predicate" => "stat:mean", "object" => $mean]);
-            array_push($output, ["subject" => $p, "predicate" => "stat:variance", "object" => $var]);
-            array_push($output, ["subject" => $p, "predicate" => "stat:firstQuartile", "object" => $firstq]);
-            array_push($output, ["subject" => $p, "predicate" => "stat:thirdQuartile", "object" => $thirdq]);
+            $beginning = Util::createLiteral($oldest->format('Y-m-d\TH:i:s'), 'http://www.w3.org/2001/XMLSchema#dateTime');
+            $end = Util::createLiteral($latest->format('Y-m-d\TH:i:s'), 'http://www.w3.org/2001/XMLSchema#dateTime');
+            array_push($output, ["subject" => $summaryURL, "predicate" => "rdf:type", "object" => "ts:Summary"]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "rdf:predicate", "object" => "datex:numberOfVacantSpaces"]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "rdf:subject", "object" => $p]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "ts:median", "object" => $median]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "ts:mean", "object" => $mean]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "ts:variance", "object" => $var]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "ts:firstQuartile", "object" => $firstq]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "ts:thirdQuartile", "object" => $thirdq]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "time:hasBeginning", "object" => $beginning]);
+            array_push($output, ["subject" => $summaryURL, "predicate" => "time:hasEnd", "object" => $end]);
+            $index++;
         }
 
         // Write statistics to file
         $writer = new TriGWriter();
-        $writer->addPrefix('stat', 'http://datapiloten.be/vocab/timeseries#');
+        $writer->addPrefix('ts', 'http://datapiloten.be/vocab/timeseries#');
+        $writer->addPrefix('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+        $writer->addPrefix('time', 'https://www.w3.org/TR/owl-time/');
+        $writer->addPrefix('datex', 'http://vocab.datex.org/terms#');
         $writer->addTriples($output);
         $this->stat_fs->put($filename, $writer->end());
     }
