@@ -18,7 +18,10 @@ Class View
         $negotiator = new Negotiator();
         $priorities = array('application/trig','application/xml', 'application/ld+json');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
-        $value = $mediaType->getValue();
+        $value = 'application/trig';
+        if ($mediaType !== null) {
+            $value = $mediaType->getValue();
+        }
         header("Content-type: $value");
         //Max age is 1/2 minute for caches
         if ($historic) {
