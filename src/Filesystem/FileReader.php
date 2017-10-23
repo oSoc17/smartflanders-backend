@@ -39,19 +39,15 @@ class FileReader extends FileSystemProcessor {
         $next = $this->getNextFileFromTimestamp($file_timestamp);
         if ($prev) {
             $triple = [
-                'subject' => $file_subject,
-                'predicate' => "hydra:previous",
-                'object' => $server . "?page=" . $prev,
-                'graph' => '#Metadata'
+                'subject' => $file_subject, 'predicate' => "hydra:previous",
+                'object' => $server . "?page=" . $prev, 'graph' => '#Metadata'
             ];
             array_push($multigraph["triples"], $triple);
         }
         if ($next) {
             $triple = [
-                'subject' => $file_subject,
-                'predicate' => "hydra:next",
-                'object' => $server . "?page=" . $next,
-                'graph' => '#Metadata'
+                'subject' => $file_subject, 'predicate' => "hydra:next",
+                'object' => $server . "?page=" . $next, 'graph' => '#Metadata'
             ];
             array_push($multigraph["triples"], $triple);
         }
