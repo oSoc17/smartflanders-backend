@@ -21,6 +21,8 @@ class JSONLDWriter
                 $obj = $this->applyPrefixes($triple["object"]);
                 if (substr($obj, 0, 1) === '"') {
                     $obj = Util::getLiteralValue($obj);
+                } else {
+                    $obj = ["@id" => $triple["object"]];
                 }
                 $this->graph[$triple["subject"]][$pred] = $obj;
             } else {
@@ -30,6 +32,11 @@ class JSONLDWriter
                 }
                 $pred = $this->applyPrefixes($triple["predicate"]);
                 $obj = $this->applyPrefixes($triple["object"]);
+                if (substr($obj, 0, 1) === '"') {
+                    $obj = Util::getLiteralValue($obj);
+                } else {
+                    $obj = ["@id" => $triple["object"]];
+                }
                 if (substr($obj, 0, 1) === '"') {
                     $obj = Util::getLiteralValue($obj);
                 }

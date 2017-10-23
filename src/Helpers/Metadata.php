@@ -74,7 +74,7 @@ Class Metadata
         //This is a fake search sequence to trick the current version of the Linked Data Fragments client to work with this file
         self::addTriple($result, $dataset, "hydra:search", $search);
         self::addTriple($result, $dataset, "rdf:type", "void:Dataset");
-        self::addTriple($result, $dataset, "void:subset", '<>');
+        self::addTriple($result, $dataset, "void:subset", '');
         self::addTriple($result, $dataset, "mdi:hasRangeGate", $base_url . '/rangegate'); // TODO don't hardcode rangegate URLs
         self::addTriple($result, $mappingS, "hydra:variable", '"s"');
         self::addTriple($result, $mappingP, "hydra:variable", '"p"');
