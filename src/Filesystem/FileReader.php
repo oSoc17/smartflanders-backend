@@ -39,19 +39,15 @@ class FileReader extends FileSystemProcessor {
         $next = $this->getNextFileFromTimestamp($file_timestamp);
         if ($prev) {
             $triple = [
-                'subject' => $file_subject,
-                'predicate' => "hydra:previous",
-                'object' => $server . "?page=" . $prev,
-                'graph' => '#Metadata'
+                'subject' => $file_subject, 'predicate' => "hydra:previous",
+                'object' => $server . "?page=" . $prev, 'graph' => '#Metadata'
             ];
             array_push($multigraph["triples"], $triple);
         }
         if ($next) {
             $triple = [
-                'subject' => $file_subject,
-                'predicate' => "hydra:next",
-                'object' => $server . "?page=" . $next,
-                'graph' => '#Metadata'
+                'subject' => $file_subject, 'predicate' => "hydra:next",
+                'object' => $server . "?page=" . $next, 'graph' => '#Metadata'
             ];
             array_push($multigraph["triples"], $triple);
         }
@@ -184,7 +180,11 @@ class FileReader extends FileSystemProcessor {
     private function getNextFileFromTimestamp($timestamp) {
         $next_ts = $this->getNextTimestampForTimestamp($timestamp);
         if ($next_ts) {
-            return date("Y-m-d\TH:i:s", $next_ts);
+            if ($this->out_fs->has($next_ts)) {
+                return date("Y-m-d\TH:i:s", $next_ts);
+            } else {
+                return $this->getNextFileFromTimestamp($next_ts + $this->second_interval);
+            }
         }
         return false;
     }
@@ -194,7 +194,11 @@ class FileReader extends FileSystemProcessor {
         $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
             $prev_ts -= $this->second_interval;
-            return date("Y-m-d\TH:i:s", $prev_ts);
+            if ($this->out_fs->has($prev_ts)) {
+                return date("Y-m-d\TH:i:s", $prev_ts);
+            } else {
+                return $this->getPreviousFileFromTimestamp($prev_ts);
+            }
         }
         return false;
     }

@@ -13,12 +13,14 @@ use oSoc\Smartflanders\Helpers;
 
 Class View
 {
-    private static function headers($acceptHeader, $historic, $rt_max_age) {
+    private static function headers($acceptHeader, $historic, $rt_max_age, $priorities = array('application/trig','application/xml', 'application/ld+json')) {
         // Content negotiation using vendor/willdurand/negotiation
         $negotiator = new Negotiator();
-        $priorities = array('application/trig','application/xml');
         $mediaType = $negotiator->getBest($acceptHeader, $priorities);
-        $value = $mediaType->getValue();
+        $value = 'application/trig';
+        if ($mediaType !== null) {
+            $value = $mediaType->getValue();
+        }
         header("Content-type: $value");
         //Max age is 1/2 minute for caches
         if ($historic) {
@@ -36,16 +38,21 @@ Class View
     }
 
     public static function viewRangeGate($rangegate) {
-        // TODO content negotiation, cache headers
-        header("Content-type: text/turtle");
-        header("Cache-Control: max-age=31536000");
-        header("Access-Control-Allow-Origin: *");
-        header("Vary: Accept");
+        // TODO check if actually historic, rt_max_age
+        $value = self::headers($_SERVER['HTTP_ACCEPT'], false, 60*60*3, ['application/ld+json', 'application/trig']);
         $graph = $rangegate->getGraph();
-        $writer = new TriGWriter(["format" => "text/turtle"]);
-        $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
-        $writer->addTriples($graph["triples"]);
-        echo $writer->end();
+
+        if ($value === 'application/trig') {
+            $writer = new TriGWriter(["format" => $value]);
+            $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+            $writer->addTriples($graph["triples"]);
+            echo $writer->end();
+        } else if ($value === 'application/ld+json') {
+            $writer = new Helpers\JSONLDWriter();
+            $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
+            $writer->addTriples($graph["triples"]);
+            echo $writer->serialize();
+        }
     }
 
     public static function view($graph_processor, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
@@ -110,6 +117,11 @@ Class View
                     echo $writer->end();
                 } else if ($value === 'application/xml') {
                     $writer = new Helpers\DatexSerializer();
+                    $writer->addTriples($graphs["triples"]);
+                    echo $writer->serialize();
+                } else if ($value === 'application/ld+json') {
+                    $writer = new Helpers\JSONLDWriter();
+                    $writer->addPrefixes(Helpers\TripleHelper::getPrefixes());
                     $writer->addTriples($graphs["triples"]);
                     echo $writer->serialize();
                 }
