@@ -9,18 +9,16 @@ use oSoc\Smartflanders\RangeGate;
 class Router
 {
     private $router;
-    private $http_host;
     private $out_dirname;
     private $res_dirname;
     private $second_interval;
     private $nameToGP;
     private $processors_gather;
 
-    public function __construct($http_host, $out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather) {
+    public function __construct($out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather) {
         $this->router = new Bramus\Router\Router();
         $this->router->set404(function() {echo "Page not found.";});
 
-        $this->http_host = $http_host;
         $this->out_dirname = $out_dirname;
         $this->res_dirname = $res_dirname;
         $this->second_interval = $second_interval;
@@ -38,7 +36,7 @@ class Router
         $processors_gather = $this->processors_gather;
 
         $found = false;
-        $dataset_name = explode('.', $this->http_host)[0];
+        $dataset_name = explode('.', $_SERVER['HTTP_HOST'])[0];
         $dataset = null; $fs = null; $calc = null;
         foreach($this->nameToGP as $name => $gp) {
             if ($name === $dataset_name) {

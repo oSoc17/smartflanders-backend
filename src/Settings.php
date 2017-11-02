@@ -3,6 +3,7 @@
 namespace oSoc\Smartflanders;
 
 use Dotenv\Dotenv;
+use oSoc\Smartflanders\Helpers\IGraphProcessor;
 
 class Settings
 {
@@ -25,6 +26,14 @@ class Settings
         $this->resource_dir = $_ENV["RESOURCE_DIR"];
         $this->default_gather_interval = $_ENV["DEFAULT_GATHER_INTERVAL"];
         $this->range_gates_config = $_ENV["RANGE_GATES_CONFIG"];
+    }
+
+    function getOutDir() {
+        return $this->data_dir;
+    }
+
+    function getResourcesDir() {
+        return $this->resource_dir;
     }
 
     function getDatasets() {

@@ -14,8 +14,15 @@ use Dotenv\Dotenv;
 $dotenv = new Dotenv(__DIR__ . '/../');
 $dotenv->load();
 
-$processors = get_datasets_from_names(explode(',', $_ENV['DATASETS']), $dotenv);
-$processors_gather = get_datasets_from_names(explode(',', $_ENV["DATASETS_GATHER"]), $dotenv);
+$settings = new Settings();
+$processors = $settings->getDatasets();
+$processors_gather = $settings->getDatasetsGather();
+$out_dirname = $settings->getOutDir();
+$res_dirname = $settings->getResourcesDir();
+$second_interval = $settings->getDefaultGatherInterval();
+
+//$processors = get_datasets_from_names(explode(',', $_ENV['DATASETS']), $dotenv);
+//$processors_gather = get_datasets_from_names(explode(',', $_ENV["DATASETS_GATHER"]), $dotenv);
 
 $nameToGP = [];
 foreach($processors as $gp) {
@@ -24,14 +31,11 @@ foreach($processors as $gp) {
     $nameToGP[$name_lower] = $gp;
 }
 
-$out_dirname = __DIR__ . "/../out";
-$res_dirname = __DIR__ . "/../resources";
-$second_interval = 60*60*3; // TODO store this in .env!
-
-$router = new Router($_SERVER['HTTP_HOST'], $out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather);
+$router = new Router($out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather);
 $router->init();
 $router->run();
 
+/*
 function get_datasets_from_names($names, $dotenv) {
     $result = array();
     foreach($names as $dataset) {
@@ -45,4 +49,4 @@ function get_datasets_from_names($names, $dotenv) {
         }
     }
     return $result;
-}
+}*/
