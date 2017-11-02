@@ -30,7 +30,6 @@ foreach($processors as $gp) {
     $name_lower = strtolower($name);
     $nameToGP[$name_lower] = $gp;
 }
-
 $router = new Router($out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather);
 $router->init();
 $router->run();

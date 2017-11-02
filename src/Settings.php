@@ -12,8 +12,8 @@ class Settings
     private $default_gather_interval;
     private $range_gates_config;
     private $dotenv;
-    private $datasets;
-    private $datasets_gather;
+    private $datasets = array();
+    private $datasets_gather = array();
 
     function __construct() {
         $this->dotenv = new Dotenv(__DIR__ . '/../');
@@ -22,8 +22,8 @@ class Settings
         $this->required();
         $this->parseDatasets();
 
-        $this->data_dir = $_ENV["DATA_DIR"];
-        $this->resource_dir = $_ENV["RESOURCE_DIR"];
+        $this->data_dir = __DIR__ . '/../' . $_ENV["DATA_DIR"];
+        $this->resource_dir = __DIR__ . '/../' . $_ENV["RESOURCE_DIR"];
         $this->default_gather_interval = $_ENV["DEFAULT_GATHER_INTERVAL"];
         $this->range_gates_config = $_ENV["RANGE_GATES_CONFIG"];
     }
