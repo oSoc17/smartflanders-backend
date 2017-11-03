@@ -1,0 +1,30 @@
+{
+  "deploy:base_url": "example.com",
+
+  "cities:number": 1,
+
+  "parkings:min_num_per_city": 1,
+  "parkings:max_num_per_city": 1,
+  "parkings:min_spaces": 100,
+  "parkings:max_spaces": 100,
+
+  "time:start": "2017-09-25T12:00:00",
+  "time:end": "2017-09-26T12:00:00",
+  "time:time_per_file": 86400,
+  "time:interval": 30,
+
+  "events:min_events": 1,
+  "events:max_events": 3,
+  "events:min_duration": 1,
+  "events:max_duration": 8,
+  "events:min_occupation": 0.2,
+  "events:max_occupation": 0.8,
+
+  "events:min_lambda": 0.5,
+  "events:max_lambda": 2,
+  "events:lambda_var": 0.07,
+
+  "events:min_sigma": 0.05,
+  "events:max_sigma": 1,
+  "events:sigma_var": 0.04
+}
