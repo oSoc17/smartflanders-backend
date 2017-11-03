@@ -2,24 +2,18 @@
 
 namespace oSoc\Smartflanders\Datasets\Netherlands;
 use oSoc\Smartflanders\Helpers;
-use Dotenv;
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
+use oSoc\Smartflanders\Settings;
 
 class NetherlandsToRDF implements Helpers\IGraphProcessor
 {
 
-    private $publish_url, $fetch_url, $res_fs;
+    private $publish_url, $fetch_url;
 
-    public function __construct()
+    public function __construct($publish)
     {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
-        $dotenv->load();
-        $this->publish_url = $_ENV['NEDERLAND_PUBLISH'];
-        $this->fetch_url = $_ENV['NEDERLAND_FETCH'];
-        // TODO this is a bad dependency. Resources directory should be added to .env.
-        $res_adapter = new Local(__DIR__ . '/../../../resources');
-        $this->res_fs = new Filesystem($res_adapter);
+        $this->publish_url = $publish;
     }
 
     public function getDynamicGraph()
@@ -97,20 +91,24 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
 
     public function mustQuery()
     {
+        $settings = Settings::getInstance();
+        $res_adapter = new Local($settings->getResourcesDir());
+        $res_fs = new Filesystem($res_adapter);
+
         $filename = 'Nederland_last_measurement';
         $now = time();
-        if ($this->res_fs->has($filename)) {
-            $string_value = $this->res_fs->read($filename);
+        if ($res_fs->has($filename)) {
+            $string_value = $res_fs->read($filename);
             $int_value = intval($string_value);
             if ($now - $int_value > 30*60) {
                 // Only query once every 30 minutes
-                $this->res_fs->put($filename, $now);
+                $res_fs->put($filename, $now);
                 return true;
             } else {
                 return false;
             }
         }
-        $this->res_fs->write($filename, $now);
+        $res_fs->write($filename, $now);
         return true;
     }
 
@@ -126,5 +124,10 @@ class NetherlandsToRDF implements Helpers\IGraphProcessor
             }
         }
         return $accessible_parkings;
+    }
+
+    public function setFetchUrl($url)
+    {
+        $this->fetch_url = $url;
     }
 }

@@ -3,18 +3,14 @@
 namespace oSoc\Smartflanders\Datasets\ParkoKortrijk;
 
 use oSoc\Smartflanders\Helpers;
-use Dotenv;
 
 class ParkoToRDF implements Helpers\IGraphProcessor {
 
     private $publish_url, $fetch_url;
 
-    public function __construct()
+    public function __construct($publish)
     {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
-        $dotenv->load();
-        $this->publish_url = $_ENV['PARKO_KORTRIJK_PUBLISH'];
-        $this->fetch_url = $_ENV['PARKO_KORTRIJK_FETCH'];
+        $this->publish_url = $publish;
     }
 
     public function getDynamicGraph()
@@ -83,5 +79,10 @@ class ParkoToRDF implements Helpers\IGraphProcessor {
     public function mustQuery()
     {
         return true;
+    }
+
+    public function setFetchUrl($url)
+    {
+        $this->fetch_url = $url;
     }
 }

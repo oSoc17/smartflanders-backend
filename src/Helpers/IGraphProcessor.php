@@ -9,4 +9,5 @@ Interface IGraphProcessor {
     public function getBaseUrl();
     public function getRealTimeMaxAge();
     public function mustQuery();
+    public function setFetchUrl($url);
 }

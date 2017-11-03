@@ -3,10 +3,10 @@
 namespace oSoc\Smartflanders;
 
 use Dotenv\Dotenv;
-use oSoc\Smartflanders\Helpers\IGraphProcessor;
 
 class Settings
 {
+    private static $instance = null;
     private $data_dir;
     private $resource_dir;
     private $default_gather_interval;
@@ -15,7 +15,7 @@ class Settings
     private $datasets = array();
     private $datasets_gather = array();
 
-    function __construct() {
+    private function __construct() {
         $this->dotenv = new Dotenv(__DIR__ . '/../');
         $this->dotenv->load();
 
@@ -76,12 +76,25 @@ class Settings
     private function parseDataset($dataset) {
         try {
             $this->dotenv->required($dataset . "_PATH");
+            $this->dotenv->required($dataset . "_PUBLISH");
             $class = $_ENV[$dataset . "_PATH"];
-            return new $class;
+            $publish = $_ENV[$dataset . "_PUBLISH"];
+            $processor = new $class($publish);
+            if (isset($_ENV[$dataset . "_FETCH"])) {
+                $processor->setFetchUrl($_ENV[$dataset . "_FETCH"]);
+            }
+            return $processor;
         } catch (\Exception $e) {
             error_log("Invalid .env configuration: dataset " . $dataset . " has no corresponding class path."
                 . " Please add the variable " . $dataset . "_PATH.");
         }
         return null;
+    }
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new Settings();
+        }
+        return self::$instance;
     }
 }

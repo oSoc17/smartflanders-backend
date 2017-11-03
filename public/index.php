@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use oSoc\Smartflanders\Datasets;
 
-$settings = new Settings();
+$settings = Settings::getInstance();
 
 $router = new Router($settings);
 $router->init();

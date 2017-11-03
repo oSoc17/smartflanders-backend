@@ -9,9 +9,8 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
     private $fetch_url, $publish_url;
     private $authHeader;
 
-    public function __construct($fetch_url, $publish_url)
+    public function __construct($publish_url)
     {
-        $this->fetch_url = $fetch_url;
         $this->publish_url = $publish_url;
         $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
         $dotenv->load();
@@ -72,5 +71,10 @@ abstract class IxorToRDF implements Helpers\IGraphProcessor
     public function mustQuery()
     {
         return true;
+    }
+
+    public function setFetchUrl($url)
+    {
+        $this->fetch_url = $url;
     }
 }
