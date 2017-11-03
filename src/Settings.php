@@ -3,6 +3,8 @@
 namespace oSoc\Smartflanders;
 
 use Dotenv\Dotenv;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 
 class Settings
 {
@@ -16,7 +18,15 @@ class Settings
     private $datasets_gather = array();
 
     private function __construct() {
-        $this->dotenv = new Dotenv(__DIR__ . '/../');
+
+        $env_adapter = new Local(__DIR__ . '/../');
+        $env_fs = new Filesystem($env_adapter);
+        if ($env_fs->has('.env.benchmark')) {
+            $this->dotenv = new Dotenv(__DIR__ . '/../', '.env.benchmark');
+        } else {
+            $this->dotenv = new Dotenv(__DIR__ . '/../');
+        }
+
         $this->dotenv->load();
 
         $this->required();

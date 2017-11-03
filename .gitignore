@@ -4,6 +4,7 @@ benchmark/resources/*
 
 # Hide .env from repo
 .env
+.env.benchmark
 
 log/*
 sandbox.php

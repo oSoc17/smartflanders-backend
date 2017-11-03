@@ -54,6 +54,22 @@ genProc.on('exit', code => console.log("Process exited with exit code", code));
     // Data, resource dir: benchmark/out, benchmark/resources
     // Default gather interval: arbitrary
     // base_publish === config.base_url
+let env = "";
+let datasets = 'DATASETS="';
+outdirs.forEach(dir => {
+    let caps = dir.toUpperCase();
+    env += caps + '_PUBLISH="http://' + dir + '.' + config["deploy:base_url"] + '"\n';
+    datasets += caps + ',';
+    env += caps + '_PATH=oSoc\\Smartflanders\\Datasets\\Benchmark\\Benchmark' + '\n';
+});
+env += datasets + '"\n';
+env += 'RANGE_GATES_CONFIG="' + config["deploy:rangegate_config"] + '"\n';
+env += 'DATA_DIR="benchmark/out"\n';
+env += 'RESOURCE_DIR="benchmark/resources"\n';
+env += 'DEFAULT_GATHER_INTERVAL=' + config["time:time_per_file"] + '\n'; // TODO this is not right in .env!
+env += 'BASE_PUBLISH="' + config["deploy:base_url"] + '"\n';
+
+fs.writeFileSync('../.env.benchmark', env);
 
 // Generate resources: oldest timestamps, static data
 
