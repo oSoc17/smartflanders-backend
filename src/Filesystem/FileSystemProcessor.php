@@ -7,6 +7,7 @@ namespace oSoc\Smartflanders\Filesystem;
 use \League\Flysystem\Adapter\Local;
 use \League\Flysystem\Filesystem;
 use oSoc\Smartflanders\Helpers\IGraphProcessor;
+use oSoc\Smartflanders\Settings;
 use pietercolpaert\hardf\TriGWriter;
 
 
@@ -20,13 +21,15 @@ Class FileSystemProcessor {
     protected $static_data_filename;
     protected $out_dirname;
     protected $res_dirname;
+    protected $settings;
     const REFRESH_STATIC = false;
 
-    public function __construct($out_dirname, $res_dirname, $second_interval, IGraphProcessor $graph_processor)
+    public function __construct(Settings $settings, IGraphProcessor $graph_processor)
     {
-        $this->out_dirname = $out_dirname;
-        $this->res_dirname = $res_dirname;
-        $this->second_interval = $second_interval;
+        $this->settings = $settings;
+        $this->out_dirname = $settings->getOutDir();
+        $this->res_dirname = $settings->getResourcesDir();
+        $this->second_interval = $settings->getDefaultGatherInterval();
         date_default_timezone_set("Europe/Brussels");
         $out_adapter = new Local($this->out_dirname . "/" . $graph_processor->getName());
         $this->out_fs = new Filesystem($out_adapter);
@@ -122,10 +125,10 @@ Class FileSystemProcessor {
     }
 
     public function getFileReader() {
-        return new FileReader($this->out_dirname, $this->res_dirname, $this->second_interval, $this->graph_processor);
+        return new FileReader($this->settings, $this->graph_processor);
     }
 
     public function getFileWriter() {
-        return new FileWriter($this->out_dirname, $this->res_dirname, $this->second_interval, $this->graph_processor);
+        return new FileWriter($this->settings, $this->graph_processor);
     }
 }

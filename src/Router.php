@@ -3,37 +3,29 @@
 namespace oSoc\Smartflanders;
 
 use Bramus;
-use Dotenv\Dotenv;
 use oSoc\Smartflanders\RangeGate;
 
 class Router
 {
     private $router;
-    private $out_dirname;
-    private $res_dirname;
-    private $second_interval;
-    private $nameToGP;
-    private $processors_gather;
+    private $settings;
+    private $nameToGP = array();
 
-    public function __construct($out_dirname, $res_dirname, $second_interval, $nameToGP, $processors_gather) {
+    public function __construct(Settings $settings) {
         $this->router = new Bramus\Router\Router();
         $this->router->set404(function() {echo "Page not found.";});
 
-        $this->out_dirname = $out_dirname;
-        $this->res_dirname = $res_dirname;
-        $this->second_interval = $second_interval;
-        $this->nameToGP = $nameToGP;
-        $this->processors_gather = $processors_gather;
+        foreach($settings->getDatasets() as $gp) {
+            $name = $gp->getName();
+            $name_lower = strtolower($name);
+            $this->nameToGP[$name_lower] = $gp;
+        }
 
-        $dotenv = new Dotenv(__DIR__ . '/../');
-        $dotenv->load();
+        $this->settings = $settings;
     }
 
     public function init() {
-        $out_dirname = $this->out_dirname;
-        $res_dirname = $this->res_dirname;
-        $second_interval = $this->second_interval;
-        $processors_gather = $this->processors_gather;
+        $settings = $this->settings;
 
         $found = false;
         $dataset_name = explode('.', $_SERVER['HTTP_HOST'])[0];
@@ -42,14 +34,14 @@ class Router
             if ($name === $dataset_name) {
                 $found = true;
                 $dataset = $this->nameToGP[$dataset_name];
-                $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $dataset);
+                $fs = new Filesystem\FileSystemProcessor($this->settings, $dataset);
             }
         }
 
         $this->router->get('/parking',
-            function() use ($found, $dataset, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
+            function() use ($settings, $found, $dataset) {
                 if ($found) {
-                    View::view($dataset, $out_dirname, $res_dirname, $second_interval, $processors_gather);
+                    View::view($settings, $dataset);
                 } else {
                     http_response_code(404);
                     die("Route not found: " . $dataset);

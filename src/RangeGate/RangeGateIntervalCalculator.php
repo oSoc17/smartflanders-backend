@@ -15,10 +15,6 @@ class RangeGateIntervalCalculator
     );
 
     public function __construct($configString, $oldest_timestamp) {
-        // Round the oldest timestamp up to 1 day
-        /*$day = 60*60*24;
-        $rest = $oldest_timestamp % $day;
-        $this->oldest = $oldest_timestamp + $day - $rest - 2*60*60;*/
         $this->oldest = \DateTime::createFromFormat('U', $oldest_timestamp);
 
         // Parse the configuration string
@@ -47,13 +43,6 @@ class RangeGateIntervalCalculator
             return false;
         }
 
-        // Determine if start is valid (must be a multiple of diff greater than oldest_timestamp)
-        //$start_relative = $interval[0] - $this->oldest;
-        /*$start_relative = $interval[0]->diff($this->oldest)->days;
-        var_dump($start_relative % $diff);
-        if ($start_relative % $diff !== 0) {
-            return false;
-        }*/
         return true;
     }
 
@@ -67,13 +56,6 @@ class RangeGateIntervalCalculator
     public function getRootSubRangeGates() {
         return $this->calculateSubRangeGates(-1, $this->oldest);
     }
-
-    /*private function dayDiff($interval) {
-        $from = new \DateTime(date('c', $interval[0]));
-        $to = new \DateTime(date('c', $interval[1]));
-        $diff = $from->diff($to);
-        return $diff->days;
-    }*/
 
     private function calculateSubRangeGates($level_index, \DateTime $lower_bound) {
         $result = array();
