@@ -48,17 +48,12 @@ Class FileSystemProcessor {
         $start = $start - ($start % 60*60*24); // Round down to day
         $start = $this->getPreviousTimestampFromTimestamp($start); // Get valid timestamp
         $end = $start + 60*60*24;
-        for ($i = $start; $i < $end; $i += $this->settings->getDefaultGatherInterval()) {
+        for ($i = $start; $i < $end; $i += $this->settings->getTimePerFile()) {
             if ($this->hasFile($i)) {
                 array_push($result, $i);
             }
         }
         return $result;
-    }
-
-    public function getSecondInterval()
-    {
-        return $this->settings->getDefaultGatherInterval();
     }
 
     // Get the last written page (closest to now)
@@ -77,7 +72,7 @@ Class FileSystemProcessor {
 
     // Round a timestamp to its respective file timestamp
     protected function roundTimestamp($timestamp) {
-        $timestamp -= $timestamp % $this->settings->getDefaultGatherInterval();
+        $timestamp -= $timestamp % $this->settings->getTimePerFile();
         return $timestamp;
     }
 
@@ -90,7 +85,7 @@ Class FileSystemProcessor {
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
                 }
-                $timestamp -= $this->settings->getDefaultGatherInterval();
+                $timestamp -= $this->settings->getTimePerFile();
             }
         }
         return false;
@@ -100,7 +95,7 @@ Class FileSystemProcessor {
         $timestamp = $this->roundTimestamp($timestamp);
         $now = time();
         while($timestamp < $now) {
-            $timestamp += $this->settings->getDefaultGatherInterval();
+            $timestamp += $this->settings->getTimePerFile();
             $filename = $this->roundTimestamp($timestamp);
             if ($this->out_fs->has($filename)) {
                 return $timestamp;

@@ -11,7 +11,7 @@ class Settings
     private static $instance = null;
     private $data_dir;
     private $resource_dir;
-    private $default_gather_interval;
+    private $time_per_file;
     private $range_gates_config;
     private $dotenv;
     private $datasets = array();
@@ -34,7 +34,7 @@ class Settings
 
         $this->data_dir = __DIR__ . '/../' . $_ENV["DATA_DIR"];
         $this->resource_dir = __DIR__ . '/../' . $_ENV["RESOURCE_DIR"];
-        $this->default_gather_interval = $_ENV["DEFAULT_GATHER_INTERVAL"];
+        $this->time_per_file = $_ENV["TIME_PER_FILE"];
         $this->range_gates_config = $_ENV["RANGE_GATES_CONFIG"];
     }
 
@@ -54,8 +54,8 @@ class Settings
         return $this->datasets_gather;
     }
 
-    function getDefaultGatherInterval() {
-        return $this->default_gather_interval;
+    function getTimePerFile() {
+        return $this->time_per_file;
     }
 
     function getRangeGatesConfig() {

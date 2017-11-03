@@ -47,13 +47,6 @@ let genProc = childProcess.fork(script, ['lpd_config.json']);
 genProc.on('exit', code => console.log("Process exited with exit code", code));
 
 // Generate .env file
-    // Publish URLs
-    // Datasets, Datasets_gather
-    // Paths: oSoc\Smartflanders\Datasets\Benchmark\Benchmark
-    // Rangegate config === config.rangegate_config
-    // Data, resource dir: benchmark/out, benchmark/resources
-    // Default gather interval: arbitrary
-    // base_publish === config.base_url
 let env = "";
 let datasets = 'DATASETS="';
 outdirs.forEach(dir => {
