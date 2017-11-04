@@ -55,7 +55,8 @@ outdirs.forEach(dir => {
     datasets += caps + ',';
     env += caps + '_PATH=oSoc\\Smartflanders\\Datasets\\Benchmark\\Benchmark' + '\n';
 });
-env += datasets + '"\n';
+env += datasets.slice(0,-1) + '"\n';
+env += 'DATASETS_GATHER=""';
 env += 'RANGE_GATES_CONFIG="' + config["deploy:rangegate_config"] + '"\n';
 env += 'DATA_DIR="benchmark/out"\n';
 env += 'RESOURCE_DIR="benchmark/resources"\n';
@@ -65,5 +66,11 @@ env += 'BASE_PUBLISH="' + config["deploy:base_url"] + '"\n';
 fs.writeFileSync('../.env.benchmark', env);
 
 // Generate resources: oldest timestamps, static data
+outdirs.forEach(dir => {
+    const files = fs.readdirSync(path.join('out', dir));
+    files.forEach(file => {
+
+    })
+});
 
 // Deploy php -S

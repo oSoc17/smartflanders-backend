@@ -39,12 +39,12 @@ class Router
         }
 
         $this->router->get('/parking',
-            function() use ($settings, $found, $dataset) {
+            function() use ($settings, $found, $dataset, $dataset_name) {
                 if ($found) {
                     View::view($settings, $dataset);
                 } else {
                     http_response_code(404);
-                    die("Route not found: " . $dataset);
+                    die("Dataset not found: " . $dataset_name);
                 }
             }
         );
