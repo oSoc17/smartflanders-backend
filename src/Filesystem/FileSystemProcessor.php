@@ -98,7 +98,7 @@ Class FileSystemProcessor {
                 if ($this->out_fs->has($filename)) {
                     return $timestamp;
                 }
-                $timestamp -= $this->second_interval;
+                $timestamp -= 60*60;
             }
         }
         return false;
@@ -108,7 +108,7 @@ Class FileSystemProcessor {
         $timestamp = $this->roundTimestamp($timestamp);
         $now = time();
         while($timestamp < $now) {
-            $timestamp += $this->second_interval;
+            $timestamp += 60*60;
             $filename = $this->roundTimestamp($timestamp);
             if ($this->out_fs->has($filename)) {
                 return $timestamp;
