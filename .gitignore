@@ -1,3 +1,7 @@
+benchmark/node_modules/*
+benchmark/out/*
+benchmark/resources/*
+
 # Hide .env from repo
 .env
 
