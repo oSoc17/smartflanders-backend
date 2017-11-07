@@ -1,7 +1,6 @@
 {
   "deploy:base_url": "example.com",
   "deploy:rangegate_config": "1Y,1M,1W,1D",
-  "deploy:lpdgen_location": "../../lpdgenerator/bin",
 
   "cities:number": 5,
 

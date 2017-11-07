@@ -2,6 +2,7 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const path = require('path');
 const N3 = require('n3');
+const lpdgen = require('lpdgenerator');
 
 if (process.argv.length !== 3) {
     console.error("Usage: node deploy_benchmark.js CONFIG");
