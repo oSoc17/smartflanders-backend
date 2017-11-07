@@ -67,7 +67,7 @@ class Settings
         $this->dotenv->required('RESOURCE_DIR');
         $this->dotenv->required('DATASETS');
         $this->dotenv->required('DATASETS_GATHER');
-        $this->dotenv->required('DEFAULT_GATHER_INTERVAL');
+        $this->dotenv->required('TIME_PER_FILE');
     }
 
     private function parseDatasets() {
