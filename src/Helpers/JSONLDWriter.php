@@ -37,9 +37,9 @@ class JSONLDWriter
                 } else {
                     $obj = ["@id" => $triple["object"]];
                 }
-                if (substr($obj, 0, 1) === '"') {
+                /*if (substr($obj, 0, 1) === '"') {
                     $obj = Util::getLiteralValue($obj);
-                }
+                }*/
                 array_push($this->graph[$triple["graph"]]["@graph"], ["@id" => $triple["subject"], $pred => $obj]);
             }
         }

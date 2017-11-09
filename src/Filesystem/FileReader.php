@@ -191,9 +191,9 @@ class FileReader extends FileSystemProcessor {
 
     // Get previous page for requested timestamp (this is the previous page to page_for_timestamp)
     private function getPreviousFileFromTimestamp($timestamp) {
-        $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
+        $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp); // file containing timestamp
+        $prev_ts = $this->getPreviousTimestampFromTimestamp($prev_ts - 1); // Previous file
         if ($prev_ts) {
-            $prev_ts -= $this->second_interval;
             if ($this->out_fs->has($prev_ts)) {
                 return date("Y-m-d\TH:i:s", $prev_ts);
             } else {
