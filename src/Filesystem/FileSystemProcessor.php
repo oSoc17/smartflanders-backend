@@ -85,7 +85,8 @@ Class FileSystemProcessor {
 
     // Round a timestamp to its respective file timestamp
     protected function roundTimestamp($timestamp) {
-        $timestamp -= $timestamp % $this->second_interval;
+        //$timestamp -= $timestamp % $this->second_interval;
+        $timestamp -= $timestamp %  3600;
         return $timestamp;
     }
 
