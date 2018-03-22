@@ -79,9 +79,9 @@ Class Metadata
         self::addTriple($result, $mappingS, "hydra:variable", '"s"');
         self::addTriple($result, $mappingP, "hydra:variable", '"p"');
         self::addTriple($result, $mappingO, "hydra:variable", '"o"');
-        self::addTriple($result, $mappingS, "hydra:property", '"subject"');
-        self::addTriple($result, $mappingP, "hydra:property", '"property"');
-        self::addTriple($result, $mappingO, "hydra:property", '"object"');
+        self::addTriple($result, $mappingS, "hydra:property", 'rdf:subject');
+        self::addTriple($result, $mappingP, "hydra:property", 'rdf:predicate');
+        self::addTriple($result, $mappingO, "hydra:property", 'rdf:object');
         self::addTriple($result, $search, "hydra:template", '"' . $base_url . '"');
         self::addTriple($result, $search, "hydra:mapping", $mappingS);
         self::addTriple($result, $search, "hydra:mapping", $mappingP);
