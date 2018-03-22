@@ -74,14 +74,14 @@ Class Metadata
         //This is a fake search sequence to trick the current version of the Linked Data Fragments client to work with this file
         self::addTriple($result, $dataset, "hydra:search", $search);
         self::addTriple($result, $dataset, "rdf:type", "void:Dataset");
-        self::addTriple($result, $dataset, "void:subset", '');
+        self::addTriple($result, $dataset, "void:subset", $base_url);
         self::addTriple($result, $dataset, "mdi:hasRangeGate", $base_url . '/rangegate'); // TODO don't hardcode rangegate URLs
         self::addTriple($result, $mappingS, "hydra:variable", '"s"');
         self::addTriple($result, $mappingP, "hydra:variable", '"p"');
         self::addTriple($result, $mappingO, "hydra:variable", '"o"');
-        self::addTriple($result, $mappingS, "hydra:property", '"subject"');
-        self::addTriple($result, $mappingP, "hydra:property", '"property"');
-        self::addTriple($result, $mappingO, "hydra:property", '"object"');
+        self::addTriple($result, $mappingS, "hydra:property", 'rdf:subject');
+        self::addTriple($result, $mappingP, "hydra:property", 'rdf:predicate');
+        self::addTriple($result, $mappingO, "hydra:property", 'rdf:object');
         self::addTriple($result, $search, "hydra:template", '"' . $base_url . '"');
         self::addTriple($result, $search, "hydra:mapping", $mappingS);
         self::addTriple($result, $search, "hydra:mapping", $mappingP);
