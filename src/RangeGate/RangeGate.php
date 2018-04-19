@@ -2,7 +2,6 @@
 
 namespace oSoc\Smartflanders\RangeGate;
 
-use Dotenv\Dotenv;
 use oSoc\Smartflanders\Filesystem\FileSystemProcessor;
 use oSoc\Smartflanders\Helpers\IGraphProcessor;
 use oSoc\Smartflanders\Helpers\TripleHelper;
@@ -23,9 +22,6 @@ class RangeGate
         $this->gatename = $gatename;
         $this->dataset = $dataset;
         $this->fs = $fs;
-
-        $dotenv = new Dotenv(__DIR__ . '/../../');
-        $dotenv->load();
 
         $this->intervalCalculator = new RangeGateIntervalCalculator($_ENV['RANGE_GATES_CONFIG'], $fs->getOldestTimestamp());
         $this->baseUrl = $this->dataset->getBaseUrl() . '/rangegate/';

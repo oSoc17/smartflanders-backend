@@ -7,7 +7,6 @@
 
 namespace oSoc\Smartflanders\Datasets\GentParking;
 use oSoc\Smartflanders\Helpers;
-use Dotenv;
 
 Class GhentToRDF implements Helpers\IGraphProcessor
 {
@@ -19,14 +18,12 @@ Class GhentToRDF implements Helpers\IGraphProcessor
     private static $parkingURIs;
     private static $sameAs;
 
-    public function __construct()
+    public function __construct($publish)
     {
-        $dotenv = new Dotenv\Dotenv(__DIR__ . '/../../../');
-        $dotenv->load();
         $this->urls = [
             self::STAT => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkings/",
             self::DYN => "http://opendataportaalmobiliteitsbedrijf.stad.gent/datex2/v2/parkingsstatus",
-            self::BASE => $_ENV['GHENT_PUBLISH']
+            self::BASE => $publish
         ];
     }
 
@@ -148,4 +145,6 @@ Class GhentToRDF implements Helpers\IGraphProcessor
 
         return $graph;
     }
+
+    public function setFetchUrl($url) {}
 }

@@ -55,7 +55,8 @@ Class View
         }
     }
 
-    public static function view($graph_processor, $out_dirname, $res_dirname, $second_interval, $processors_gather) {
+    public static function view(Settings $settings, Helpers\IGraphProcessor $graph_processor) {
+        $processors_gather = $settings->getDatasetsGather();
         if (in_array($graph_processor, $processors_gather)) {
             // This data is being gathered here, get the file
             // If no preferred content type is specified, prefer turtle
@@ -65,7 +66,7 @@ Class View
 
             $filename = null;
 
-            $fs = new Filesystem\FileSystemProcessor($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+            $fs = new Filesystem\FileSystemProcessor($settings, $graph_processor);
 
             if (!isset($_GET['page']) && !isset($_GET['time'])) {
                 $timestamp = $fs->getLastPage();
@@ -96,7 +97,7 @@ Class View
                 header('Location: ' . $graph_processor->getBaseUrl() . '?page=' . $filename);
             } else {
                 // This is sloppy coding
-                $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
+                $fileReader = new Filesystem\FileReader($settings, $graph_processor);
                 $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
                 $historic = true;
                 if ((string)$filename === $fs->getLastPage()) {

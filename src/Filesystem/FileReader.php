@@ -183,7 +183,7 @@ class FileReader extends FileSystemProcessor {
             if ($this->out_fs->has($next_ts)) {
                 return date("Y-m-d\TH:i:s", $next_ts);
             } else {
-                return $this->getNextFileFromTimestamp($next_ts + $this->second_interval);
+                return $this->getNextFileFromTimestamp($next_ts + $this->settings->getTimePerFile());
             }
         }
         return false;
@@ -193,7 +193,7 @@ class FileReader extends FileSystemProcessor {
     private function getPreviousFileFromTimestamp($timestamp) {
         $prev_ts = $this->getPreviousTimestampFromTimestamp($timestamp);
         if ($prev_ts) {
-            $prev_ts -= $this->second_interval;
+            $prev_ts -= $this->settings->getTimePerFile();
             if ($this->out_fs->has($prev_ts)) {
                 return date("Y-m-d\TH:i:s", $prev_ts);
             } else {
