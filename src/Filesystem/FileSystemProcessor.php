@@ -94,11 +94,10 @@ Class FileSystemProcessor {
         if ($oldest) {
             $timestamp = $this->roundTimestamp($timestamp);
             while ($timestamp > $oldest) {
-                $filename = $this->roundTimestamp($timestamp);
-                if ($this->out_fs->has($filename)) {
+                if ($this->out_fs->has($timestamp)) {
                     return $timestamp;
                 }
-                $timestamp -= $this->second_interval;
+                $timestamp -= 60*60;
             }
         }
         return false;
