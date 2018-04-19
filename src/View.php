@@ -99,7 +99,7 @@ Class View
                 $fileReader = new Filesystem\FileReader($out_dirname, $res_dirname ,$second_interval, $graph_processor);
                 $graphs = $fileReader->getFullyDressedGraphsFromFile($filename);
                 $historic = true;
-                if ((string)$filename === $fs->getLastPage()) {
+                if ((string)$filename === $fs->getLastPage() || (string)$timestamp === $fs->getLastPage()) {
                     $historic = false;
                 }
                 $value = self::headers($_SERVER['HTTP_ACCEPT'], $historic, $graph_processor->getRealTimeMaxAge());
